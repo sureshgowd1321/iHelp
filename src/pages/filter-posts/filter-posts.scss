@@ -1,0 +1,24 @@
+page-filter-posts {
+    .background{
+        width:100%;
+        height:100%;
+    }
+    .title-image {
+        margin-top: 20px;
+        margin-left: 80px;
+        height:100px;
+        width: 100px;
+        position: relative;
+    }
+    .card-display{
+        margin-top: 30px;
+        position: relative;
+    }
+    .no-scroll .scroll-content{
+        overflow: hidden;
+    }
+
+    .labelStyle {
+        color: blue;
+    }
+}

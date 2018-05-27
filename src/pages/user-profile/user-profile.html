@@ -1,0 +1,128 @@
+<!--
+  Generated template for the UserProfilePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>{{nameVar}} Profile</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content class="background">
+
+    <!-- Display Image -->
+    <div>
+      <img src="{{ userProfilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)" class="roung-img" > 
+    </div>
+
+    <div>
+      <!-- Display Name -->
+      <ion-item >
+        <ion-grid>
+          <ion-row>
+            <ion-col width-50 class="labelStyle">
+              Name
+            </ion-col>
+            <ion-col >
+                {{nameVar}}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+
+      <ion-item >
+        <ion-grid>
+          <ion-row>
+            <ion-col width-50 class="labelStyle">
+              Gender
+            </ion-col>
+            <ion-col >
+                {{gender}}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+  
+      <ion-item >
+        <ion-grid>
+          <ion-row>
+            <ion-col width-50 class="labelStyle">
+              City
+            </ion-col>
+            <ion-col >
+                {{cityVar}}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    
+      <ion-item >
+          <ion-grid>
+            <ion-row>
+              <ion-col width-50 class="labelStyle">
+                State
+              </ion-col>
+              <ion-col >
+                  {{stateVar}}
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+    
+      <ion-item >
+        <ion-grid>
+          <ion-row>
+            <ion-col width-50 class="labelStyle">
+              Country
+            </ion-col>
+            <ion-col >
+                {{countryVar}}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    
+      <!-- Display Email  -->
+      <ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col width-50 class="labelStyle">
+              Email
+            </ion-col>
+            <ion-col class="placeholder-profile">
+              <span>
+                  {{emailVar}}
+              </span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item> 
+    
+     <!-- <ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col width-50 class="labelStyle">
+              Total <ion-icon [style.color]="'red'" name="ios-star" ></ion-icon>
+            </ion-col>
+            <ion-col class="placeholder-profile">
+              <span>
+                  <!-- {{userInfo?.totalstars}} -->
+              <!--  {{ (userObj | async)?.totalStars }} 
+              </span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item> -->
+    
+      <!-- Display My Posts  -->
+      <button ion-item (click)="goToUserPosts(userUid)" class="labelStyle">
+          {{nameVar}}'s Posts
+      </button>
+    
+    </div>
+
+</ion-content>
