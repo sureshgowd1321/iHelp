@@ -39,9 +39,6 @@ export class HomePage {
   order: string = 'id';
   reverse: boolean = true;
 
-  // HTTP Base URI 
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
-
   // Pagination Variables
   page = 1;
   maximumPages = 40;
@@ -118,7 +115,7 @@ export class HomePage {
                                 // Check each post has Image or not
                                 let postImage;
                                 if(postImages != false){
-                                  postImage = this.baseURI + postImages.images_path;
+                                  postImage = constants.baseURI + postImages.images_path;
                                 }
 
                                 this.posts.push(
@@ -133,7 +130,7 @@ export class HomePage {
                                     "city"         : userLocationInfo.City,
                                     "state"        : userLocationInfo.State,
                                     "country"      : userLocationInfo.Country,
-                                    "profilePic"   : this.baseURI + userProfilePic.images_path,
+                                    "profilePic"   : constants.baseURI + userProfilePic.images_path,
                                     "wishId"       : wishlistInfo.id,
                                     "addedToWishlist" : isPostInWishlist,
                                     "likesCount"      : likesCount,

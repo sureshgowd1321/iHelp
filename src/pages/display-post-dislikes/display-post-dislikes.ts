@@ -33,7 +33,6 @@ export class DisplayPostDislikesPage {
 
   postId: string;
   dislikes: dislikesInfo[] = [];
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
 
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
@@ -60,7 +59,7 @@ export class DisplayPostDislikesPage {
                   this.dislikes.push({
                     "userId"     : dislike.UserUid,
                     "userName"   : userinfo.name,
-                    "profilePic" : this.baseURI + userProfilePic.images_path
+                    "profilePic" : constants.baseURI + userProfilePic.images_path
                   });
               });
             });

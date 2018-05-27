@@ -17,6 +17,9 @@ import { ICountries } from '../../providers/interface/interface';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 import { Camera } from '@ionic-native/camera';
 
+//Pages
+import { AddNewLocationPage } from '../add-new-location/add-new-location';
+
 /**
  * Generated class for the EditProfilePage page.
  *
@@ -49,8 +52,6 @@ export class EditProfilePage {
   public updatedName: string;
   public updatedGender: string;
 
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
-
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               public phpService: PhpServiceProvider,
@@ -77,7 +78,7 @@ export class EditProfilePage {
           this.userCountry = locationinfo.Country;
           this.userState = locationinfo.State;
           this.userCity = locationinfo.City;
-          this.userProfilePic = this.baseURI + userProfilePic.images_path;
+          this.userProfilePic = constants.baseURI + userProfilePic.images_path;
 
           this.selectedCountry = locationinfo.Country;
           this.selectedState = locationinfo.State;
@@ -183,7 +184,7 @@ export class EditProfilePage {
           headers: {}
         }
 
-        fileTransfer.upload(this.base64Image, this.baseURI+'saveimage.php', options_file)
+        fileTransfer.upload(this.base64Image, constants.baseURI+'saveimage.php', options_file)
         .then((data) => {
           this.currentUserProfilePicture();
           loader.dismiss();
@@ -224,7 +225,7 @@ export class EditProfilePage {
         }
 
         console.log('Entered Gallery: '+ imageData);
-        fileTransfer.upload(this.base64Image, this.baseURI+'saveimage.php', options_file)
+        fileTransfer.upload(this.base64Image, constants.baseURI+'saveimage.php', options_file)
           .then((data) => {
           // success
           this.currentUserProfilePicture();
@@ -245,7 +246,7 @@ export class EditProfilePage {
   {
     this.phpService.getUserProfilePic(this.user.uid)
     .subscribe(userProfilePic => {
-      this.userProfilePic = this.baseURI + userProfilePic.images_path;
+      this.userProfilePic = constants.baseURI + userProfilePic.images_path;
     });
   }
 
@@ -282,6 +283,11 @@ export class EditProfilePage {
     });
 
     actionSheet.present();
+  }
+
+  // Go to Add New Location Page to add new location
+  gotoAddNewLocationPage() {
+    this.navCtrl.push(AddNewLocationPage);
   }
   
 }

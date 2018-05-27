@@ -34,8 +34,6 @@ export class UserProfilePage {
   userUid: string;
   gender: string;
 
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
-
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               public phpService: PhpServiceProvider,
@@ -57,7 +55,7 @@ export class UserProfilePage {
           this.countryVar = locationinfo.Country;
           this.stateVar = locationinfo.State;
           this.cityVar = locationinfo.City;
-          this.userProfilePic = this.baseURI + userProfilePic.images_path;
+          this.userProfilePic = constants.baseURI + userProfilePic.images_path;
 
         });
       }); 

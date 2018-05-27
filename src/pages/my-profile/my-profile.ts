@@ -42,8 +42,6 @@ export class MyProfilePage {
   userProfilePic: string;
   userUid: string;
 
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
-
   constructor(public _app: App,
               private profileData: ProfileDataProvider, 
               private afAuth: AngularFireAuth, 
@@ -67,7 +65,7 @@ export class MyProfilePage {
           this.countryVar = locationinfo.Country;
           this.stateVar = locationinfo.State;
           this.cityVar = locationinfo.City;
-          this.userProfilePic = this.baseURI + userProfilePic.images_path;
+          this.userProfilePic = constants.baseURI + userProfilePic.images_path;
 
         });
       }); 

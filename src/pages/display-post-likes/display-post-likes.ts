@@ -33,7 +33,7 @@ export class DisplayPostLikesPage {
 
   postId: string;
   likes: likesInfo[] = [];
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
+  //private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
 
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
@@ -60,7 +60,7 @@ export class DisplayPostLikesPage {
                   this.likes.push({
                     "userId"     : like.UserUid,
                     "userName"   : userinfo.name,
-                    "profilePic" : this.baseURI + userProfilePic.images_path
+                    "profilePic" : constants.baseURI + userProfilePic.images_path
                   });
               });
             });

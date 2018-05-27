@@ -16,6 +16,9 @@ import { ICountries } from '../../providers/interface/interface';
 import { PhpServiceProvider } from '../../providers/php-service/php-service';
 import { AuthServiceProvider } from '../../providers/auth-service/auth-service';
 
+//Pages
+import { AddNewLocationPage } from '../add-new-location/add-new-location';
+
 /**
  * Generated class for the SignUpPage page.
  *
@@ -61,9 +64,7 @@ export class SignUpPage {
 
   ionViewWillEnter()
   {  
-    console.log('&&Entered Signup');
     this.phpService.getAllCountries().subscribe(countriesInfo => {
-      console.log('***Countries: '+ countriesInfo);
       countriesInfo.forEach(countryObj=>{
 
         this.allLocations.push({
@@ -147,6 +148,11 @@ export class SignUpPage {
 
   goToLoginPage(): void {
 	  this.navCtrl.pop();
+  }
+
+  // Go to Add New Location Page to add new location
+  gotoAddNewLocationPage() {
+    this.navCtrl.push(AddNewLocationPage);
   }
 
 }

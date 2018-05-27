@@ -5,14 +5,46 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-
   <ion-navbar>
-    <ion-title>add-new-location</ion-title>
+    <ion-title>Add Your Location</ion-title>
   </ion-navbar>
-
 </ion-header>
 
+<ion-content class="background">
+    <ion-card class="card-display">
+    <ion-card-content class="no-scroll">
+        <form [formGroup]="newLocationForm" (submit)="addNewLocation()" novalidate>
+            <ion-list no-lines>
+                <ion-item>
+                  <ion-label floating color="primary">Country</ion-label>
+                  <ion-input #country formControlName="country" type="string" [class.invalid]="!newLocationForm.controls.country.valid && newLocationForm.controls.country.dirty"></ion-input>
+                </ion-item>
+                <ion-item class="error-message" *ngIf="!newLocationForm.controls.country.valid && newLocationForm.controls.country.dirty">
+                  <p>Please enter a valid Country.</p>
+                </ion-item>
 
-<ion-content padding>
+                <ion-item>
+                  <ion-label floating color="primary">State</ion-label>
+                  <ion-input #state formControlName="state" type="string" [class.invalid]="!newLocationForm.controls.state.valid && newLocationForm.controls.state.dirty"></ion-input>
+                </ion-item>
+                <ion-item class="error-message" *ngIf="!newLocationForm.controls.state.valid && newLocationForm.controls.state.dirty">
+                  <p>Please enter a valid State.</p>
+                </ion-item>
 
+                <ion-item>
+                  <ion-label floating color="primary">City</ion-label>
+                  <ion-input #city formControlName="city" type="string" [class.invalid]="!newLocationForm.controls.city.valid && newLocationForm.controls.city.dirty"></ion-input>
+                </ion-item>
+                <ion-item class="error-message" *ngIf="!newLocationForm.controls.city.valid && newLocationForm.controls.city.dirty">
+                  <p>Please enter a valid City.</p>
+                </ion-item>
+
+                <button ion-button color="primary" block outline type="submit"> 
+                    Add your location
+                </button>
+
+            </ion-list>
+        </form>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

@@ -30,6 +30,7 @@ import { CommentsPage } from '../pages/comments/comments';
 import { DisplayPostLikesPage } from '../pages/display-post-likes/display-post-likes';
 import { DisplayPostDislikesPage } from '../pages/display-post-dislikes/display-post-dislikes';
 import { UserPostsPage } from '../pages/user-posts/user-posts';
+import { AddNewLocationPage } from '../pages/add-new-location/add-new-location';
 
 // Native plugins
 import { StatusBar } from '@ionic-native/status-bar';
@@ -62,7 +63,8 @@ import { ProfileDataProvider } from '../providers/profile-data/profile-data';
     CommentsPage,
     DisplayPostLikesPage,
     DisplayPostDislikesPage,
-    UserPostsPage
+    UserPostsPage,
+    AddNewLocationPage
   ],
   imports: [
     BrowserModule,
@@ -93,7 +95,8 @@ import { ProfileDataProvider } from '../providers/profile-data/profile-data';
     CommentsPage,
     DisplayPostLikesPage,
     DisplayPostDislikesPage,
-    UserPostsPage
+    UserPostsPage,
+    AddNewLocationPage
   ],
   providers: [
     StatusBar,

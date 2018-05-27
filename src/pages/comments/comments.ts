@@ -64,8 +64,6 @@ export class CommentsPage {
 
   commentInput: string;
 
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
-
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               private profileData: ProfileDataProvider,
@@ -131,17 +129,17 @@ export class CommentsPage {
                         // Check each post has Image or not
                         let postImage;
                         if(postImages != false){
-                          postImage = this.baseURI + postImages.images_path;
+                          postImage = constants.baseURI + postImages.images_path;
                         }
-                        console.log('**COmments Image: '+ postImage);
+
                         this.postObj          = postInfo;
                         this.userObj          = userinfo;
-                        this.profilePic       = this.baseURI + userProfilePic.images_path;
+                        this.profilePic       = constants.baseURI + userProfilePic.images_path;
                         this.isPostInWishlist = isInWishlist;
                         this.likesCount       = likesCount;
                         this.isPostLiked      = isLiked;
-                        this.dislikesCount       = dislikesCount;
-                        this.isPostDisliked      = isDisliked;
+                        this.dislikesCount    = dislikesCount;
+                        this.isPostDisliked   = isDisliked;
                         this.commentsCount    = commentsCount;
                         this.postImage        = postImage;
                       });
@@ -181,7 +179,7 @@ export class CommentsPage {
                   "commentedDate" : commentObj.commentedDate,
                   "name"          : userinfo.name,
                   "nickname"      : userinfo.nickname,
-                  "profilePic"    : this.baseURI + userProfilePic.images_path
+                  "profilePic"    : constants.baseURI + userProfilePic.images_path
                 });
               });      
             });     
