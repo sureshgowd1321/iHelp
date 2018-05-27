@@ -1,3 +1,58 @@
 page-edit-profile {
-
+    .background{
+         background: linear-gradient(10deg,#4E5EFC,#4EE7FC);
+     }
+     .scroll-content{
+         text-align: center;
+     }
+     .title-image {
+         margin-top: 20px;
+         margin-left: 80px;
+         height:100px;
+         width: 100px;
+         position: relative;
+     }
+     .card-display{
+         margin-top: 30px;
+         position: relative;
+     }
+     .no-scroll .scroll-content{
+         overflow: hidden;
+     }
+ 
+     .labelStyle {
+         color: blue;
+     }
+ 
+     .locHeader {
+         margin-left: 20px;
+         text-align: left;
+     }
+ 
+     .roung-img {
+         height: 150px !important;
+         width: 150px !important;
+         margin-top: 1%;
+         background: linear-gradient(10deg,#4E5EFC,#4EE7FC) !important;
+         background-color :linear-gradient(10deg,#4E5EFC,#4EE7FC) !important;
+         border-radius: 50%;
+         background-position: center center;
+         background-size: contain;
+     }
+ 
+     .profilebutton {
+         z-index: 2;
+         position: absolute;
+         left: 65%;
+         top: 8%;
+         margin: auto;
+     }
+     .profilepic {
+         border:1px solid rgb(161, 32, 32);
+         width: 65%;
+         height: 65%;
+    }
+     .profilepic-border {
+         position: relative;
+    }
 }

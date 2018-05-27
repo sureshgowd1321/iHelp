@@ -7,12 +7,96 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>user-posts</ion-title>
+    <ion-title>Posts</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
-<ion-content padding>
+<ion-content >
+
+    <ion-refresher (ionRefresh)="loadrefresh($event)">
+        <ion-refresher-content pullingText="Pull to refresh"
+                        pullingIcon="arrow-dropdown"
+                        refreshingSpinner="circles"
+                        refreshingText="..fetching">
+        </ion-refresher-content>
+    </ion-refresher>
+
+    <ion-card *ngFor="let item of posts | orderBy: order:reverse:'case-insensitive'">  
+  
+        <ion-item>
+
+            <ion-avatar item-left >
+                <img src="{{ item.profilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)" >
+            </ion-avatar>
+
+            <ion-avatar item-right (click)="modifyCardActionSheet(item.id, posts, item)" *ngIf="item.createdById == loggedInUser" >
+                <ion-icon name="ios-arrow-down"></ion-icon>
+            </ion-avatar>
+
+            <ion-avatar item-right (click)="addToWishlist(item.id, item)" *ngIf="item.createdById != loggedInUser && !item.addedToWishlist">
+                <ion-icon name="ios-heart-outline"></ion-icon>
+            </ion-avatar>
+
+            <ion-avatar item-right (click)="removeFromWishlist(item.id, item)" *ngIf="item.createdById != loggedInUser && item.addedToWishlist">
+                <ion-icon name="ios-heart"></ion-icon>
+            </ion-avatar>
+
+            <a class="text-primary">
+                <h2> {{ item.name }} </h2>
+                <p> {{ item.createdDate | date: 'medium'}}  </p>
+            </a>
+        </ion-item>
+ 
+        <ion-card-content  >
+            <p (click)="gotoCommentsPage(item.id, posts, item)">  {{ item.post }} </p>
+            <p> <img src="{{ item.postImages }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="item.postImages !== null"> </p>
+        </ion-card-content>
+        
+        <ion-item (click)="gotoCommentsPage(item.id, posts, item)">
+            <p> <ion-icon name="thumbs-up" icon-left></ion-icon> {{ item.likesCount }} . &nbsp;
+                <ion-icon name="thumbs-down" icon-left></ion-icon> {{ item.dislikesCount }}  . &nbsp;
+                <ion-icon name="text" icon-left></ion-icon>{{ item.commentsCount }} </p>
+        </ion-item>
+
+        <ion-row>
+            <ion-col>
+                <button ion-button icon-left clear small (click)="addLike(item.id, item)" *ngIf="!item.isPostLiked" >
+                    <ion-icon name="ios-thumbs-up-outline"></ion-icon>
+                    <div>Like</div>
+                </button>
+
+                <button ion-button icon-left clear small (click)="removeLike(item.id, item)" *ngIf="item.isPostLiked">
+                    <ion-icon name="thumbs-up"></ion-icon>
+                    <div>Like</div>
+                </button>
+            </ion-col>
+
+            <ion-col>
+                <button ion-button icon-left clear small (click)="addDislike(item.id, item)" *ngIf="!item.isPostDisliked" >
+                    <ion-icon name="ios-thumbs-down-outline"></ion-icon>
+                    <div>Dislike</div>
+                </button>
+    
+                <button ion-button icon-left clear small (click)="removeDislike(item.id, item)" *ngIf="item.isPostDisliked">
+                    <ion-icon name="thumbs-down"></ion-icon>
+                    <div>Dislike</div>
+                </button>
+            </ion-col>
+
+            <ion-col (click)="gotoCommentsPage(item.id, posts, item)">
+                <button ion-button icon-right clear small >
+                    <ion-icon name="text"></ion-icon>
+                    <div>Comment</div>
+                </button>
+            </ion-col>
+        </ion-row>
+
+    </ion-card> 
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)" >
+        <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
 
 </ion-content>

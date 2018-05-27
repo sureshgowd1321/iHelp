@@ -1,17 +1,115 @@
+<!--
+  Generated template for the Home page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
 <ion-header>
   <ion-navbar>
-    <ion-title>Home</ion-title>
+    <ion-title class="labelStyle">Home Page</ion-title>
+    
+    <ion-buttons end>
+      
+      <button ion-button block color="primary" (click)="gotoFilterPostPage()">
+          <ion-icon name="funnel"></ion-icon>
+      </button>
+
+      <button ion-button block color="primary" (click)="gotoAddPost()">
+          <ion-icon name="add-circle"></ion-icon>
+      </button>
+
+    </ion-buttons>
+
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <h2>Welcome to Ionic!</h2>
-  <p>
-    This starter project comes with simple tabs-based layout for apps
-    that are going to primarily use a Tabbed UI.
-  </p>
-  <p>
-    Take a look at the <code>src/pages/</code> directory to add or change tabs,
-    update any existing page or create new pages.
-  </p>
+<ion-content id="listScroll"> 
+
+  <p padding *ngIf="posts.length === 0"> No Posts. You can add new posts with in your location. </p>
+
+    <ion-refresher (ionRefresh)="loadrefresh($event)">
+      <ion-refresher-content pullingText="Pull to refresh"
+                      pullingIcon="arrow-dropdown"
+                      refreshingSpinner="circles"
+                      refreshingText="..fetching">
+      </ion-refresher-content>
+    </ion-refresher>
+    <!-- <div *ngIf="posts.length === 0"> No Posts </div> -->
+   
+    <ion-card *ngFor="let item of posts | orderBy: order:reverse:'case-insensitive'"  >    
+
+      <ion-item>
+
+          <ion-avatar item-left >
+              <img src="{{ item.profilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)" >
+          </ion-avatar>
+
+          <ion-avatar item-right (click)="modifyCardActionSheet(item.id, posts, item)" *ngIf="item.createdById == user.uid">
+              <ion-icon name="ios-arrow-down"></ion-icon>
+          </ion-avatar>
+
+          <ion-avatar item-right (click)="addToWishlist(item.id, item)" *ngIf="item.createdById != user.uid && !item.addedToWishlist">
+            <ion-icon name="ios-heart-outline"></ion-icon>
+          </ion-avatar>
+
+          <ion-avatar item-right (click)="removeFromWishlist(item.id, item)" *ngIf="item.createdById != user.uid && item.addedToWishlist">
+            <ion-icon name="ios-heart"></ion-icon>
+          </ion-avatar>
+
+          <a class="text-primary">
+              <h2 (click)="gotoUsersPage(item.createdById)" class="labelStyle"> {{ item.name }} </h2>
+              <p> {{ item.createdDate | date: 'medium' }}  </p>
+          </a>
+      </ion-item>
+
+      <ion-card-content  >
+            <p (click)="gotoCommentsPage(item.id, posts, item)"> {{ item.post }} </p>  
+            <p> <img src="{{ item.postImages }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="item.postImages !== null"> </p>
+      </ion-card-content>
+
+      <ion-item (click)="gotoCommentsPage(item.id, posts, item)">
+      <p> <ion-icon name="thumbs-up" icon-left></ion-icon> {{ item.likesCount }}  . &nbsp;
+        <ion-icon name="thumbs-down" icon-left></ion-icon> {{ item.dislikesCount }}  . &nbsp;
+        <ion-icon name="text" icon-left></ion-icon> {{ item.commentsCount }} </p>
+      </ion-item>
+
+      <ion-row>
+        <ion-col>
+          <button ion-button icon-left clear small (click)="addLike(item.id, item)" *ngIf="!item.isPostLiked" >
+            <ion-icon name="ios-thumbs-up-outline"></ion-icon>
+            <div>Like</div>
+          </button>
+
+          <button ion-button icon-left clear small (click)="removeLike(item.id, item)" *ngIf="item.isPostLiked">
+            <ion-icon name="thumbs-up"></ion-icon>
+            <div>Like</div>
+          </button>
+        </ion-col>
+
+        <ion-col>
+          <button ion-button icon-left clear small (click)="addDislike(item.id, item)" *ngIf="!item.isPostDisliked" >
+            <ion-icon name="ios-thumbs-down-outline"></ion-icon>
+            <div>Dislike</div>
+          </button>
+
+          <button ion-button icon-left clear small (click)="removeDislike(item.id, item)" *ngIf="item.isPostDisliked">
+            <ion-icon name="thumbs-down"></ion-icon>
+            <div>Dislike</div>
+          </button>
+        </ion-col>
+
+        <ion-col (click)="gotoCommentsPage(item.id, posts, item)">
+          <button ion-button icon-right clear small >
+            <ion-icon name="text"></ion-icon>
+            <div>Comment</div>
+          </button>
+        </ion-col>
+      </ion-row>
+
+  </ion-card>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)" >
+      <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
 </ion-content>

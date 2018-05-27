@@ -1,4 +1,4 @@
-//import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 
@@ -14,16 +14,9 @@ import { constants } from '../../constants/constants';
 @Injectable()
 export class PhpServiceProvider {
 
-  private baseURI   : string  = "http://"+constants.IPAddress+"/ionic-php-mysql/";
+  private baseURI   : string  = "http://"+constants.IPAddress+"/php_iHelp/";
 
-  headers: Headers;
-  options: RequestOptions;
-
-  constructor(public http: Http) {
-    this.headers = new Headers({ 'Content-Type': 'application/json', 
-                                       'Accept': 'q=0.8;application/json;q=0.9' });
-    this.options = new RequestOptions({ headers: this.headers });
-  }
+  constructor(public http : Http) {}
 
   // Get User Info
   getUserInfo(id: string){
@@ -143,6 +136,7 @@ export class PhpServiceProvider {
 
   // Get All Countries
   getAllCountries() {
+    console.log('Inside PHP:');
     return this.http.get(this.baseURI + 'get-all-locations.php?key=countries')
     .map(response => response.json());
   }

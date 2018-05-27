@@ -1,10 +1,10 @@
-//import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 
 // Firebase
 import { AngularFirestore } from 'angularfire2/firestore';
 import * as firebase from 'firebase/app'; 
+
+import { ImageViewerController } from 'ionic-img-viewer';
 
 /*
   Generated class for the ProfileDataProvider provider.
@@ -17,9 +17,8 @@ export class ProfileDataProvider {
 
   user;
 
-  constructor ( private afs: AngularFirestore,
-                public http : Http) {
-
+  constructor ( private afs: AngularFirestore, 
+                public imageViewerCtrl: ImageViewerController) {
     this.user = firebase.auth().currentUser; 
   }
 
@@ -78,5 +77,11 @@ export class ProfileDataProvider {
         console.log("Country updated successfully!");
       });
   }
+
+  // Display Image in Full Screen
+  displayImageInFullScreen(imageToView) {
+    const viewer = this.imageViewerCtrl.create(imageToView)
+    viewer.present();
+}
 
 }

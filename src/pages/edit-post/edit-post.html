@@ -5,14 +5,53 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-
+    
   <ion-navbar>
-    <ion-title>edit-post</ion-title>
+  <ion-title>Edit Post</ion-title>
+
+  <ion-buttons end>
+      <button color="primary" ion-button large icon-only (click)="uploadImageActionSheet()"><ion-icon name="camera"></ion-icon></button>
+      <button ion-button color="primary" blocked (click)="updatePost(postDesc)" >
+          Save
+      </button>
+  </ion-buttons>
   </ion-navbar>
 
 </ion-header>
 
 
-<ion-content padding>
+<ion-content class="background">
+
+  <ion-item class="no-scroll">
+      <ion-avatar item-left> 
+      <img src="{{ profilePic }}" class="thumb-img" #imageToView (click)="displayImageFullScreen(imageToView)">
+      </ion-avatar>
+      
+      <a class="text-primary">
+          <h2 >  {{ userObj?.name }} </h2>
+      </a>
+      <p> {{ postObj?.CreatedDate | date: 'medium' }} </p>
+  </ion-item>
+
+  <ion-item class="no-scroll">
+      <ion-label color="primary">Post with in</ion-label>
+      <ion-select [(ngModel)]="selectedLocation" >
+          <ion-option value="CT"> My City </ion-option>
+          <ion-option value="ST"> My State </ion-option>
+          <ion-option value="CNTY"> My Country </ion-option>
+          <ion-option value="WORLD"> Across World </ion-option>
+      </ion-select>
+  </ion-item>
+
+  <ion-item> 
+      <ion-label color="primary" stacked>Edit your post</ion-label>
+      <ion-textarea #myInput id="myInput" rows="3" maxLength="3000" (keyup)="resize()" [(ngModel)]="postDesc" autofocus></ion-textarea>
+  </ion-item>
+
+  <ion-card class="block" *ngIf="base64Image !== null">
+      <ion-icon  name="trash" class="deleteIcon" (click)="deletePhoto()"></ion-icon>
+      <img src="{{ base64Image }}" />
+  </ion-card>
 
 </ion-content>
+  

@@ -7,12 +7,77 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>edit-profile</ion-title>
+    <ion-title>Edit Profile</ion-title>
+
+    <ion-buttons end>      
+      <button ion-button icon-only color="primary" (click)="goToProfilePage()">
+          Done
+      </button>    
+    </ion-buttons>
+
   </ion-navbar>
 
 </ion-header>
 
+<ion-content >
+    
+  <div class="background">
 
-<ion-content padding>
+    <div class="item profilepic-border" align="center">
+      <ion-icon  name="camera" class="button profilebutton icon ion-camera" (click)="editPictureOptions()"></ion-icon>
+      <img src="{{ userProfilePic }}" class="roung-img" #imageToView (click)="displayImageFullScreen(imageToView)">
+    </div>
+
+  </div>
+    <ion-item>
+      <ion-label color="primary">Name</ion-label>
+      <ion-input type="string" [(ngModel)]="updatedName" ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary">Gender</ion-label>
+      <ion-select [(ngModel)]="updatedGender">
+        <ion-option value="Male">Male</ion-option>
+        <ion-option value="Female">Female</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item >
+      <ion-grid>
+        <ion-row>
+          <ion-col width-50 color="primary">
+            Your Location
+          </ion-col>
+          <ion-col >             
+            {{userCity}}, {{userCountry}}
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+
+    <ion-list-header>
+        <h6 class="locHeader">Update Your location</h6> 
+      </ion-list-header>
+
+    <ion-item>
+      <ion-label color="primary">Country</ion-label>
+      <ion-select [(ngModel)]="selectedCountry" (ionChange)="setStateValues()" >
+          <ion-option *ngFor="let country of countries" >{{country}} </ion-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item> 
+      <ion-label color="primary">State</ion-label>
+      <ion-select [(ngModel)]="selectedState" (ionChange)="setCityValues()">
+          <ion-option *ngFor="let state of selectedStates">{{state}} </ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary">City</ion-label>
+      <ion-select [(ngModel)]="selectedCity" >
+          <ion-option *ngFor="let city of selectedCities">{{city}} </ion-option>
+      </ion-select>
+    </ion-item> 
 
 </ion-content>

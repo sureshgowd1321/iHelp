@@ -1,3 +1,54 @@
 page-add-post {
+    .background{
+        width:100%;
+        height:100%;
+    }
+    .title-image {
+        margin-top: 20px;
+        margin-left: 80px;
+        height:100px;
+        width: 100px;
+        position: relative;
+    }
+    .card-display{
+        margin-top: 30px;
+        position: relative;
+    }
+    .no-scroll .scroll-content{
+        overflow: hidden;
+    }
 
+    .labelStyle {
+        color: blue;
+    }
+
+    .postBox {
+        height: 150px;
+    }
+
+    .bottomToolBar {
+        position: fixed;
+        left: 0;
+        bottom: 30px;
+        right: 0;
+    }
+
+    #myInput {
+        width: calc(100% - 10px);
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .block {
+        position: relative;
+        .deleteIcon {
+            position: absolute !important;
+            color: #080808 !important;
+            margin-left: 90% !important;
+        }
+        .deleteIcon:before {
+            font-size: 30px !important;
+        }
+    }
 }
