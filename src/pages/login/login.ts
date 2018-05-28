@@ -46,6 +46,31 @@ export class LoginPage {
   login() {
     if (!this.loginForm.valid) {
       console.log(this.loginForm.value);
+      
+      if(!this.loginForm.value.email){
+        let alert = this.alertCtrl.create({
+          message: 'Please enter valid Email',
+          buttons: [
+            {
+              text: "Ok",
+              role: 'cancel'
+            }
+          ]
+        });
+        alert.present();
+      }else if(!this.loginForm.value.password){
+        let alert = this.alertCtrl.create({
+          message: 'Please enter valid password',
+          buttons: [
+            {
+              text: "Ok",
+              role: 'cancel'
+            }
+          ]
+        });
+        alert.present();
+      }
+
     } else {
     this.firebaseAuth
       .auth

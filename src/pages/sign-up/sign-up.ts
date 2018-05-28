@@ -123,6 +123,18 @@ export class SignUpPage {
   signup() {
     if (!this.signupForm.valid){
       console.log(this.signupForm.value);
+
+      let alert = this.alertCtrl.create({
+        message: 'Please enter all the fields',
+        buttons: [
+          {
+            text: "Ok",
+            role: 'cancel'
+          }
+        ]
+      });
+      alert.present();
+
     } else {
 
         this.phpService.getLocationId(this.signupForm.value.city, this.signupForm.value.state, this.signupForm.value.country).subscribe(locationInfo => {
