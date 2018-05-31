@@ -135,7 +135,8 @@ export class PhpServiceProvider {
   // Get All Countries
   getAllCountries() {
     console.log('Inside PHP:');
-    return this.http.get(constants.baseURI + 'get-all-locations.php?key=countries')
+    //return this.http.get(constants.baseURI + 'get-all-locations.php?key=countries')
+    return this.http.get(constants.baseURI + 'get-all-locations.php')
     .map(response => response.json());
   }
 
