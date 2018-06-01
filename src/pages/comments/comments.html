@@ -101,12 +101,11 @@
   <p padding *ngIf="comments.length === 0"> Be the first person to comment </p>
 
   <ion-list *ngIf="comments.length > 0">
-    <ion-list-header>
-      Comments
-    </ion-list-header>
+    <!-- <ion-list-header> -->
+      <h6>Comments</h6>
+    <!-- </ion-list-header> -->
 
     <ion-item-sliding *ngFor="let comment of comments | orderBy: order:reverse:'case-insensitive'">
-      <!--  -->
       <ion-item class="item-icon-left" text-wrap>
         <ion-avatar item-left>
           <img src="{{ comment.profilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)">

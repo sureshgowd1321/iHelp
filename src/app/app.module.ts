@@ -5,6 +5,9 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { FormsModule } from '@angular/forms';
 
+//Ionic Cache service
+import { CacheModule } from 'ionic-cache';
+
 // Angular Fire Modules
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -70,6 +73,7 @@ import { ProfileDataProvider } from '../providers/profile-data/profile-data';
     BrowserModule,
     HttpModule,
     IonicModule.forRoot(MyApp),
+    CacheModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,

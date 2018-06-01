@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ActionSheetController, LoadingController } from 'ionic-angular';
 import * as firebase from 'firebase/app'; 
 
 //Constants
@@ -70,7 +70,8 @@ export class CommentsPage {
               public phpService: PhpServiceProvider,
               public alertCtrl: AlertController,
               public actionSheetCtrl: ActionSheetController,
-              private orderPipe: OrderPipe ) {
+              private orderPipe: OrderPipe,
+              public loadingCtrl: LoadingController ) {
     
     this.user = firebase.auth().currentUser; 
     
@@ -81,13 +82,20 @@ export class CommentsPage {
     this.isRemoveFromSlice = this.navParams.get('removeFromList');
   }
 
-  ionViewWillEnter()
+  //ionViewWillEnter()
+  ionViewDidLoad()
   {   
     this.loadpostInfo();
     this.loadAllComments(this.postId);
   }
 
   loadpostInfo(){
+
+    let loader = this.loadingCtrl.create({
+      content: "fetching..."
+    });
+    loader.present();
+
     this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{ 
       this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
         this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {
@@ -142,6 +150,8 @@ export class CommentsPage {
                         this.isPostDisliked   = isDisliked;
                         this.commentsCount    = commentsCount;
                         this.postImage        = postImage;
+
+                        loader.dismiss();
                       });
                     });
                   });
@@ -152,6 +162,8 @@ export class CommentsPage {
         });
       });
     });
+
+    
   }
 
   // Retrieve the JSON encoded data from the remote server

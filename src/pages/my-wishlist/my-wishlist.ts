@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, AlertController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, NavController, AlertController, ActionSheetController, LoadingController, ToastController } from 'ionic-angular';
 import * as firebase from 'firebase/app'; 
 
 // Interfaces
@@ -56,12 +56,14 @@ export class MyWishlistPage {
                 public alertCtrl: AlertController,
                 public actionSheetCtrl: ActionSheetController,
                 private profileData: ProfileDataProvider,
-                private orderPipe: OrderPipe) {
+                private orderPipe: OrderPipe,
+                public loadingCtrl: LoadingController,
+                public toastCtrl: ToastController) {
   
       this.user = firebase.auth().currentUser;
     }
   
-    ionViewDidLoad()
+    ionViewWillEnter()
       {  
         this.posts = [];
         this.page = 1;
@@ -72,6 +74,12 @@ export class MyWishlistPage {
       // Using Angular's Http class and an Observable - then
       // assign this to the items array for rendering to the HTML template
       loadPosts(infiniteScroll?){
+
+        // let loader = this.loadingCtrl.create({
+        //   content: "fetching..."
+        // });
+        // loader.present();
+
         this.phpService.getMyWishlist(this.page, this.user.uid).subscribe(wishlist => {
     
           wishlist.forEach(wishObj => {
@@ -130,6 +138,7 @@ export class MyWishlistPage {
                                     "postImages"      : postImage
                                   }
                                 );
+                                //loader.dismiss();
                               });
                             });
                           });
@@ -142,11 +151,12 @@ export class MyWishlistPage {
             });
           });
           this.posts = this.orderPipe.transform(this.posts, 'id');
-    
+          
           if (infiniteScroll) {
             infiniteScroll.complete();
           }
         });
+        
       }
     
       loadMore(infiniteScroll){
@@ -222,6 +232,13 @@ export class MyWishlistPage {
           var index = this.posts.indexOf(postItem);
           if (index !== -1) {
             this.posts.splice(index, 1);
+
+            let toast = this.toastCtrl.create({
+              message: `Removed from your wishlist!`,
+              duration: 2000
+            });
+            toast.present();
+
           }
         });
       }

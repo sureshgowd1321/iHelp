@@ -25,7 +25,10 @@
 
 <ion-content id="listScroll"> 
 
-  <p padding *ngIf="posts.length === 0"> No Posts. You can add new posts with in your location. </p>
+  <p padding *ngIf="!hasPosts"> 
+      <br><br>Currently There are no posts at your location. You can add new post to your city or across the world <br><br><br>
+    You can change the filter to view more posts across the world.
+  </p>
 
     <ion-refresher (ionRefresh)="loadrefresh($event)">
       <ion-refresher-content pullingText="Pull to refresh"
@@ -34,9 +37,8 @@
                       refreshingText="..fetching">
       </ion-refresher-content>
     </ion-refresher>
-    <!-- <div *ngIf="posts.length === 0"> No Posts </div> -->
    
-    <ion-card *ngFor="let item of posts | orderBy: order:reverse:'case-insensitive'"  >    
+    <ion-card *ngFor="let item of posts | orderBy: order:reverse:'case-insensitive'">    
 
       <ion-item>
 

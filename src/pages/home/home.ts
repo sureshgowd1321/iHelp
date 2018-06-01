@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { NavController, AlertController, ActionSheetController } from 'ionic-angular';
+import { NavController, AlertController, ActionSheetController, LoadingController, ToastController } from 'ionic-angular';
 import { Http } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase/app'; 
 
 //Pages
@@ -23,6 +24,9 @@ import { IPosts } from '../../providers/interface/interface';
 // Order Pipe
 import { OrderPipe } from 'ngx-order-pipe';
 
+//Ionic Cache service
+import { CacheService } from "ionic-cache";
+
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -38,6 +42,7 @@ export class HomePage {
   // Order By Variables
   order: string = 'id';
   reverse: boolean = true;
+  hasPosts: boolean = false;
 
   // Pagination Variables
   page = 1;
@@ -53,7 +58,11 @@ export class HomePage {
               public actionSheetCtrl: ActionSheetController,
               public phpService: PhpServiceProvider,
               public alertCtrl: AlertController,
-              private orderPipe: OrderPipe) {
+              private orderPipe: OrderPipe,
+              private cache: CacheService,
+              public loadingCtrl: LoadingController,
+              public toastCtrl: ToastController
+            ) {
               
       this.user = firebase.auth().currentUser;  
       
@@ -67,80 +76,98 @@ export class HomePage {
 
   // Load all posts to display
   loadPosts(infiniteScroll?){
+    let loader = this.loadingCtrl.create({
+      content: "fetching..."
+    });
+
+    if (!infiniteScroll) {
+      loader.present();
+    }
 
     this.phpService.getUserInfo(this.user.uid).subscribe(loggedInUserInfo => {
       this.phpService.getLocationInfo(loggedInUserInfo.PostalCode).subscribe(userLocationInfo => {
         this.phpService.getPosts(this.page, loggedInUserInfo.PostFilter, userLocationInfo.City, 
                                   userLocationInfo.State, userLocationInfo.Country, this.user.uid, loggedInUserInfo.CreatedDate).subscribe(postdata => {
-          console.log('***postdata: '+ postdata);                          
-          postdata.forEach(postInfo => {
+          console.log('***postdata: '+ postdata);
+          if( postdata.length === 0 ){
+            if (!infiniteScroll) {
+              this.hasPosts = false;
+              loader.dismiss();
+            }
+          }else {                         
+            postdata.forEach(postInfo => {
+              this.hasPosts = true;
 
-            this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
-              this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {                        
-                this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(userLocationInfo => {                         
-                  this.phpService.getlikesCount(postInfo.ID).subscribe(likesCount => {
-                    this.phpService.getdislikesCount(postInfo.ID).subscribe(dislikesCount => {
-                      this.phpService.getlikeInfoPerUser(this.user.uid, postInfo.ID).subscribe(userLikeInfo => {
-                        this.phpService.getDislikeInfoPerUser(this.user.uid, postInfo.ID).subscribe(userDislikeInfo => {
-                          this.phpService.getWishlistFromUserId(this.user.uid).subscribe(wishlistInfo => {                                
-                            this.phpService.getCountOfComments(postInfo.ID).subscribe(commentsCount => {
-                              this.phpService.getPostImages(postInfo.ID).subscribe(postImages => {
+              this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
+                this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {                        
+                  this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(userLocationInfo => {                         
+                    this.phpService.getlikesCount(postInfo.ID).subscribe(likesCount => {
+                      this.phpService.getdislikesCount(postInfo.ID).subscribe(dislikesCount => {
+                        this.phpService.getlikeInfoPerUser(this.user.uid, postInfo.ID).subscribe(userLikeInfo => {
+                          this.phpService.getDislikeInfoPerUser(this.user.uid, postInfo.ID).subscribe(userDislikeInfo => {
+                            this.phpService.getWishlistFromUserId(this.user.uid).subscribe(wishlistInfo => {                                
+                              this.phpService.getCountOfComments(postInfo.ID).subscribe(commentsCount => {
+                                this.phpService.getPostImages(postInfo.ID).subscribe(postImages => {
 
-                                // Check post is liked by loggedin User or not
-                                let isPostLiked = false;
-                                if( userLikeInfo === 0 ){
-                                }else{
-                                  isPostLiked = true;
-                                }
-
-                                // Check post is Disliked by loggedin User or not
-                                let isPostDisliked = false;
-                                if( userDislikeInfo === 0 ){
-                                }else{
-                                  isPostDisliked = true;
-                                }
-
-                                // Check post is added to wishlist or not
-                                let isPostInWishlist = false;
-                                if( wishlistInfo.length === 0 ){
-                                } else {
-                                  wishlistInfo.forEach(wishObj=>{
-                        
-                                    if(wishObj.PostId === postInfo.ID){
-                                      isPostInWishlist = true;
-                                    }    
-                                  });
-                                }
-
-                                // Check each post has Image or not
-                                let postImage;
-                                if(postImages != false){
-                                  postImage = constants.baseURI + postImages.images_path;
-                                }
-
-                                this.posts.push(
-                                  {
-                                    "id"           : postInfo.ID,
-                                    "post"         : postInfo.post,
-                                    "createdDate"  : postInfo.CreatedDate,
-                                    "createdById"  : postInfo.CreatedById,
-                                    "name"         : userinfo.name,
-                                    "email"        : userinfo.email,
-                                    "nickname"     : userinfo.nickname,
-                                    "city"         : userLocationInfo.City,
-                                    "state"        : userLocationInfo.State,
-                                    "country"      : userLocationInfo.Country,
-                                    "profilePic"   : constants.baseURI + userProfilePic.images_path,
-                                    "wishId"       : wishlistInfo.id,
-                                    "addedToWishlist" : isPostInWishlist,
-                                    "likesCount"      : likesCount,
-                                    "dislikesCount"   : dislikesCount,
-                                    "isPostLiked"     : isPostLiked,
-                                    "isPostDisliked"  : isPostDisliked,
-                                    "commentsCount"   : commentsCount,
-                                    "postImages"      : postImage
+                                  // Check post is liked by loggedin User or not
+                                  let isPostLiked = false;
+                                  if( userLikeInfo === 0 ){
+                                  }else{
+                                    isPostLiked = true;
                                   }
-                                );
+
+                                  // Check post is Disliked by loggedin User or not
+                                  let isPostDisliked = false;
+                                  if( userDislikeInfo === 0 ){
+                                  }else{
+                                    isPostDisliked = true;
+                                  }
+
+                                  // Check post is added to wishlist or not
+                                  let isPostInWishlist = false;
+                                  if( wishlistInfo.length === 0 ){
+                                  } else {
+                                    wishlistInfo.forEach(wishObj=>{
+                          
+                                      if(wishObj.PostId === postInfo.ID){
+                                        isPostInWishlist = true;
+                                      }    
+                                    });
+                                  }
+
+                                  // Check each post has Image or not
+                                  let postImage;
+                                  if(postImages != false){
+                                    postImage = constants.baseURI + postImages.images_path;
+                                  }
+
+                                  this.posts.push(
+                                    {
+                                      "id"           : postInfo.ID,
+                                      "post"         : postInfo.post,
+                                      "createdDate"  : postInfo.CreatedDate,
+                                      "createdById"  : postInfo.CreatedById,
+                                      "name"         : userinfo.name,
+                                      "email"        : userinfo.email,
+                                      "nickname"     : userinfo.nickname,
+                                      "city"         : userLocationInfo.City,
+                                      "state"        : userLocationInfo.State,
+                                      "country"      : userLocationInfo.Country,
+                                      "profilePic"   : constants.baseURI + userProfilePic.images_path,
+                                      "wishId"       : wishlistInfo.id,
+                                      "addedToWishlist" : isPostInWishlist,
+                                      "likesCount"      : likesCount,
+                                      "dislikesCount"   : dislikesCount,
+                                      "isPostLiked"     : isPostLiked,
+                                      "isPostDisliked"  : isPostDisliked,
+                                      "commentsCount"   : commentsCount,
+                                      "postImages"      : postImage
+                                    }
+                                  );
+                                  if (!infiniteScroll) {
+                                    loader.dismiss();
+                                  }
+                                });
                               });
                             });
                           });
@@ -151,7 +178,7 @@ export class HomePage {
                 });
               });
             });
-          });
+          }
           console.log('***this.posts: '+ this.posts);
           this.posts = this.orderPipe.transform(this.posts, 'id');
 
@@ -241,6 +268,12 @@ export class HomePage {
                           this.posts.splice(index, 1);
                         }
 
+                        let toast = this.toastCtrl.create({
+                          message: `Your Post is Deleted!`,
+                          duration: 2000
+                        });
+                        toast.present();
+                        
                       });
                     });      
                   });     
@@ -302,6 +335,13 @@ export class HomePage {
     this.phpService.addWishlist(this.user.uid, postId).subscribe(wishlistInfo => {
       var index = this.posts.indexOf(postItem);
       this.posts[index].addedToWishlist = true;
+
+      let toast = this.toastCtrl.create({
+        message: `Added to your wishlist!`,
+        duration: 2000
+      });
+      toast.present();
+
     });
   }
 
@@ -310,6 +350,13 @@ export class HomePage {
     this.phpService.deleteWishlist(this.user.uid, postId).subscribe(wishlistInfo => {
       var index = this.posts.indexOf(postItem);
       this.posts[index].addedToWishlist = false;
+
+      let toast = this.toastCtrl.create({
+        message: `Removed from your wishlist!`,
+        duration: 2000
+      });
+      toast.present();
+
     });
   }
 
