@@ -52,3 +52,11 @@ export interface ICountries {
   state     : string;
   city      : string;
 }
+
+export interface IAllPosts {
+  id           : number;
+  post         : string;
+  createdDate  : string;
+  name         : string;
+  profilePic   : string;
+}

@@ -20,6 +20,7 @@ import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 
 // Interfaces
 import { IPosts } from '../../providers/interface/interface';
+import { IAllPosts } from '../../providers/interface/interface';
 
 // Order Pipe
 import { OrderPipe } from 'ngx-order-pipe';
@@ -38,11 +39,12 @@ export class HomePage {
 
   // List of posts to display
   public posts: IPosts[] = [];
+  public allPosts: IAllPosts[] = [];
 
   // Order By Variables
   order: string = 'id';
   reverse: boolean = true;
-  hasPosts: boolean = false;
+  hasPosts: boolean = true;
 
   // Pagination Variables
   page = 1;
@@ -76,15 +78,22 @@ export class HomePage {
 
   // Load all posts to display
   loadPosts(infiniteScroll?){
-    let loader = this.loadingCtrl.create({
-      content: "fetching..."
+
+    this.phpService.getAllPosts().subscribe(postdata => {
+      postdata.forEach(postInfo => {
+        this.allPosts.push(
+          {
+            "id"           : postInfo.ID,
+            "post"         : postInfo.post,
+            "createdDate"  : postInfo.CreatedDate,
+            "name"         : postInfo.name,
+            "profilePic"   : constants.baseURI + postInfo.images_path
+          }
+        );
+      });
     });
 
-    if (!infiniteScroll) {
-      loader.present();
-    }
-
-    this.phpService.getUserInfo(this.user.uid).subscribe(loggedInUserInfo => {
+   /* this.phpService.getUserInfo(this.user.uid).subscribe(loggedInUserInfo => {
       this.phpService.getLocationInfo(loggedInUserInfo.PostalCode).subscribe(userLocationInfo => {
         this.phpService.getPosts(this.page, loggedInUserInfo.PostFilter, userLocationInfo.City, 
                                   userLocationInfo.State, userLocationInfo.Country, this.user.uid, loggedInUserInfo.CreatedDate).subscribe(postdata => {
@@ -92,7 +101,6 @@ export class HomePage {
           if( postdata.length === 0 ){
             if (!infiniteScroll) {
               this.hasPosts = false;
-              loader.dismiss();
             }
           }else {                         
             postdata.forEach(postInfo => {
@@ -164,9 +172,6 @@ export class HomePage {
                                       "postImages"      : postImage
                                     }
                                   );
-                                  if (!infiniteScroll) {
-                                    loader.dismiss();
-                                  }
                                 });
                               });
                             });
@@ -179,7 +184,6 @@ export class HomePage {
               });
             });
           }
-          console.log('***this.posts: '+ this.posts);
           this.posts = this.orderPipe.transform(this.posts, 'id');
 
           if (infiniteScroll) {
@@ -187,7 +191,7 @@ export class HomePage {
           }
         });
       });
-    });
+    });*/
   }
 
   loadMore(infiniteScroll){

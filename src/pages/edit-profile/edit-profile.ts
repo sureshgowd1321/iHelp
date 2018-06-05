@@ -180,6 +180,7 @@ export class EditProfilePage {
         let options_file: FileUploadOptions = {
           fileKey: 'file',
           fileName: 'name.jpg',
+          chunkedMode: false,
           params : {'userUid': this.user.uid},
           headers: {}
         }
@@ -220,6 +221,7 @@ export class EditProfilePage {
         let options_file: FileUploadOptions = {
           fileKey: 'file',
           fileName: 'name.jpg',
+          chunkedMode: false,
           params : {'userUid': this.user.uid},
           headers: {}
         }

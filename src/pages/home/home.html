@@ -37,7 +37,27 @@
                       refreshingText="..fetching">
       </ion-refresher-content>
     </ion-refresher>
-   
+    
+    <ion-card *ngFor="let item of allPosts" >
+        <ion-item>
+
+            <ion-avatar item-left >
+                <img src="{{ item.profilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)" >
+            </ion-avatar>
+  
+            <a class="text-primary">
+                <h2 (click)="gotoUsersPage(item.createdById)" class="labelStyle"> {{ item.name }} </h2>
+                <p> {{ item.createdDate}}  </p>
+            </a>
+        </ion-item>
+
+        <ion-card-content  >
+            <p (click)="gotoCommentsPage(item.id, posts, item)"> {{ item.post }} </p>  
+        </ion-card-content>
+
+    </ion-card>
+
+    <!--
     <ion-card *ngFor="let item of posts | orderBy: order:reverse:'case-insensitive'">    
 
       <ion-item>
@@ -60,7 +80,8 @@
 
           <a class="text-primary">
               <h2 (click)="gotoUsersPage(item.createdById)" class="labelStyle"> {{ item.name }} </h2>
-              <p> {{ item.createdDate | date: 'medium' }}  </p>
+              <p> {{ item.createdDate }}  </p>
+              <!-- <p> {{ item.createdDate | date: 'medium' }}  </p>| timeAgo  | date: 'DD/MM/YYYY,h:mm:ss a' --
           </a>
       </ion-item>
 
@@ -108,7 +129,7 @@
         </ion-col>
       </ion-row>
 
-  </ion-card>
+  </ion-card> -->
 
     <ion-infinite-scroll (ionInfinite)="loadMore($event)" >
       <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>

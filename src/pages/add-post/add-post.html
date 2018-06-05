@@ -45,7 +45,7 @@
 
   <ion-item> 
       <ion-label color="primary" stacked>What you would like to post ?</ion-label>
-      <ion-textarea #myInput id="myInput" rows="3" maxLength="3000" (keyup)="resize()" [(ngModel)]="postDesc" autofocus></ion-textarea>
+      <ion-textarea #myInput id="myInput" rows="3" maxLength="3000" (keyup)="resize()" [(ngModel)]="postDesc" ></ion-textarea>
   </ion-item>
 
   <ion-card class="block" *ngIf="base64Image !== null">

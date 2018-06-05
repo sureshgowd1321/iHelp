@@ -42,6 +42,7 @@ import { IonicImageViewerModule } from 'ionic-img-viewer';
 import { FileTransfer } from '@ionic-native/file-transfer';
 import { Camera } from '@ionic-native/camera';
 import { OrderModule } from 'ngx-order-pipe';
+// import { TimeAgoPipe } from 'time-ago-pipe';
 
 //Providers
 import { AuthServiceProvider } from '../providers/auth-service/auth-service';
@@ -68,6 +69,7 @@ import { ProfileDataProvider } from '../providers/profile-data/profile-data';
     DisplayPostDislikesPage,
     UserPostsPage,
     AddNewLocationPage
+    // TimeAgoPipe
   ],
   imports: [
     BrowserModule,

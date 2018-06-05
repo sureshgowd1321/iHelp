@@ -38,7 +38,13 @@ export class PhpServiceProvider {
                                         + '&userUid=' + userUid
                                         + '&userCreatedDate=' + createdDate)
       .map(response => response.json());
-    } 
+  } 
+
+  getAllPosts(){
+    return this.http.get(constants.baseURI + 'get-all-posts.php')
+      .map(response => response.json());
+  }
+
 
   // Get Post Information
   getPostInfo(postId: string) {
@@ -99,6 +105,12 @@ export class PhpServiceProvider {
   //Get count of Likes for each post
   getlikesCount(postId: string) {
     return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=totalLikesCountPerPost&postId=' + postId)
+    .map(response => response.json());
+  }
+
+  //Get count of Likes for each post - new
+  getLikes(postId: string) {
+    return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=totalLikes&postId=' + postId)
     .map(response => response.json());
   }
 

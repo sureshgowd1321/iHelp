@@ -182,6 +182,7 @@ export class AddPostPage {
     let options_file: FileUploadOptions = {
       fileKey: 'file',
       fileName: 'name.jpg',
+      chunkedMode: false,
       params : {'postId': postId},
       headers: {}
     }
