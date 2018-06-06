@@ -36,6 +36,10 @@ export class HomePage {
 
   // LoggedIn User Info variables
   user;
+  userFilter;
+  userCity;
+  userState;
+  userCountry;
 
   // List of posts to display
   public posts: IPosts[] = [];
@@ -68,6 +72,12 @@ export class HomePage {
               
       this.user = firebase.auth().currentUser;  
       
+      this.phpService.getUserInfo(this.user.uid).subscribe(loggedInUserInfo => {
+        this.userFilter = loggedInUserInfo.PostFilter,
+        this.userCity = loggedInUserInfo.City,
+        this.userState = loggedInUserInfo.State,
+        this.userCountry = loggedInUserInfo.Country
+      });
   }
 
   ionViewDidLoad(){  
@@ -79,15 +89,30 @@ export class HomePage {
   // Load all posts to display
   loadPosts(infiniteScroll?){
 
-    this.phpService.getAllPosts().subscribe(postdata => {
+    this.phpService.getAllPosts(this.user.uid, this.page, this.userFilter, this.userCity, this.userState, this.userCountry).subscribe(postdata => {
       postdata.forEach(postInfo => {
+
+        // Check each post has Image or not
+        let postImage;
+        if(postInfo.images_path != null){
+          postImage = constants.baseURI + postInfo.images_path;
+        }
+
         this.allPosts.push(
           {
-            "id"           : postInfo.ID,
-            "post"         : postInfo.post,
-            "createdDate"  : postInfo.CreatedDate,
-            "name"         : postInfo.name,
-            "profilePic"   : constants.baseURI + postInfo.images_path
+            "id"            : postInfo.ID,
+            "post"          : postInfo.post,
+            "createdDate"   : postInfo.CreatedDate,
+            "name"          : postInfo.name,
+            "profilePic"    : constants.baseURI + postInfo.ProfilePicURL,
+            "createdById"   : postInfo.CreatedById,
+            "postImages"    : postImage,
+            "likesCount"    : postInfo.likesCount,
+            "dislikesCount" : postInfo.dislikesCount,
+            "commentsCount" : postInfo.commentsCount,
+            "isPostLiked"   : postInfo.isLiked,
+            "isPostDisliked": postInfo.isdisLiked,
+            "isWished"      : postInfo.isWished
           }
         );
       });
