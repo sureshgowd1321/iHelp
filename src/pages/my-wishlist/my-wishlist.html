@@ -15,8 +15,6 @@
 
 <ion-content >
 
-    <p padding *ngIf="posts.length === 0"> You haven't added anything to Wishlist </p>
-
     <ion-refresher (ionRefresh)="loadrefresh($event)">
         <ion-refresher-content pullingText="Pull to refresh"
                         pullingIcon="arrow-dropdown"
@@ -25,7 +23,7 @@
         </ion-refresher-content>
     </ion-refresher>
 
-    <ion-card *ngFor="let item of posts | orderBy: order:reverse:'case-insensitive'">  
+    <ion-card *ngFor="let item of posts">  
     
       <ion-item>
 
@@ -39,7 +37,7 @@
 
           <a class="text-primary">
               <h2 (click)="gotoUsersPage(item.createdById)" class="labelStyle"> {{ item.name }} </h2>
-              <p> {{ item.createdDate | date: 'medium'}}  </p>
+              <p> {{ item.createdDate }}  </p>
           </a>
       </ion-item>
 
@@ -56,24 +54,24 @@
 
       <ion-row>
           <ion-col>
-            <button ion-button icon-left clear small (click)="addLike(item.id, item)" *ngIf="!item.isPostLiked" >
+            <button ion-button icon-left clear small (click)="addLike(item.id, item)" *ngIf="item.isPostLiked == 0" >
                 <ion-icon name="ios-thumbs-up-outline"></ion-icon>
                 <div>Like</div>
             </button>
 
-            <button ion-button icon-left clear small (click)="removeLike(item.id, item)" *ngIf="item.isPostLiked">
+            <button ion-button icon-left clear small (click)="removeLike(item.id, item)" *ngIf="item.isPostLiked == 1">
                 <ion-icon name="thumbs-up"></ion-icon>
                 <div>Like</div>
             </button>
           </ion-col>
 
           <ion-col>
-            <button ion-button icon-left clear small (click)="addDislike(item.id, item)" *ngIf="!item.isPostDisliked" >
+            <button ion-button icon-left clear small (click)="addDislike(item.id, item)" *ngIf="item.isPostDisliked == 0" >
                 <ion-icon name="ios-thumbs-down-outline"></ion-icon>
                 <div>Dislike</div>
             </button>
 
-            <button ion-button icon-left clear small (click)="removeDislike(item.id, item)" *ngIf="item.isPostDisliked">
+            <button ion-button icon-left clear small (click)="removeDislike(item.id, item)" *ngIf="item.isPostDisliked == 1">
                 <ion-icon name="thumbs-down"></ion-icon>
                 <div>Dislike</div>
             </button>
@@ -93,9 +91,4 @@
         <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>
     </ion-infinite-scroll>
 
- <!-- </div>
-
-   <div *ngIf="isWishListEmpty" >
-      <p> You have not added anything to Wishlist</p>
-  </div> -->
 </ion-content>

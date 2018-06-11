@@ -29,27 +29,27 @@ export class PhpServiceProvider {
   }
 
   // Get All Posts
-  getPosts(page: number, postFilter: string, postCity: string, postState: string, postCountry: string, userUid: string, createdDate: string) {
-      return this.http.get(constants.baseURI + 'get-posts.php?page=' + page
-                                        + '&userPostFilter=' + postFilter
-                                        + '&postedCity=' + postCity
-                                        + '&postedState=' + postState
-                                        + '&postedCountry=' + postCountry
-                                        + '&userUid=' + userUid
-                                        + '&userCreatedDate=' + createdDate)
-      .map(response => response.json());
-  } 
-
-  getAllPosts(userUid: string, page: number, postFilter: string, postCity: string, postState: string, postCountry: string){
+  // getPosts(page: number, postFilter: string, postCity: string, postState: string, postCountry: string, userUid: string, createdDate: string) {
+  //     return this.http.get(constants.baseURI + 'get-posts.php?page=' + page
+  //                                       + '&userPostFilter=' + postFilter
+  //                                       + '&postedCity=' + postCity
+  //                                       + '&postedState=' + postState
+  //                                       + '&postedCountry=' + postCountry
+  //                                       + '&userUid=' + userUid
+  //                                       + '&userCreatedDate=' + createdDate)
+  //     .map(response => response.json());
+  // } 
+  // Get All Posts
+  getAllPosts(userUid: string, page: number){
     return this.http.get(constants.baseURI + 'get-all-posts.php?userUid='+userUid
-                                          + '&page=' + page
-                                          + '&userPostFilter=' + postFilter
-                                          + '&postedCity=' + postCity
-                                          + '&postedState=' + postState
-                                          + '&postedCountry=' + postCountry)
+                                          + '&page=' + page)
       .map(response => response.json());
   }
 
+  getTimeAgo(date: string){
+    return this.http.get(constants.baseURI + 'time-ago.php?date='+date)
+          .map(response => response.text());
+  }
 
   // Get Post Information
   getPostInfo(postId: string) {
@@ -71,8 +71,9 @@ export class PhpServiceProvider {
   }
 
   // Get All Comments per post
-  getAllComments(postId: string) {
-    return this.http.get(constants.baseURI + 'get-all-comments.php?key=totalCommentsPerPost&postId='+postId)
+  getAllComments(postId: string, userId: string) {
+    return this.http.get(constants.baseURI + 'get-all-comments.php?postId='+postId
+                                                + '&userId=' + userId)
     .map(response => response.json());
   }
 

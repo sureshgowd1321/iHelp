@@ -68,3 +68,28 @@ export interface IAllPosts {
   isPostDisliked  : number;
   isWished        : number;
 }
+
+export interface IComments {
+  id                     : string;
+  comment                : string;
+  commentedById          : string;
+  commentedDate          : string;
+  commentedByName        : string;
+  commentedByProfilePic  : string;
+}
+
+export interface CommentPost{
+  postId                 : number;
+  postImage              : string;
+  postByName             : string;
+  postedByProfilePic     : string;
+  post                   : string;
+  postedDate             : string;
+  postedById             : string;
+  likesCount             : number;
+  dislikesCount          : number;
+  commentsCount          : number;
+  isLiked                : number;
+  isdisLiked             : number;
+  isWished               : number;
+}

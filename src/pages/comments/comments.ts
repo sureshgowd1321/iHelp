@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, ActionSheetController, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ActionSheetController, LoadingController, ToastController } from 'ionic-angular';
 import * as firebase from 'firebase/app'; 
 
 //Constants
@@ -10,8 +10,10 @@ import { PhpServiceProvider } from '../../providers/php-service/php-service';
 import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 
 // Interfaces
-import { IPosts } from '../../providers/interface/interface';
+import { IAllPosts } from '../../providers/interface/interface';
 import { IComment } from '../../providers/interface/interface';
+import { IComments } from '../../providers/interface/interface';
+import { CommentPost } from '../../providers/interface/interface';
 
 // Pages
 import { UserProfilePage } from '../user-profile/user-profile';
@@ -19,15 +21,14 @@ import { DisplayPostLikesPage } from '../display-post-likes/display-post-likes';
 import { DisplayPostDislikesPage } from '../display-post-dislikes/display-post-dislikes';
 import { HomePage } from '../../pages/home/home';
 
-// Order Pipe
-import { OrderPipe } from 'ngx-order-pipe';
-
 /**
  * Generated class for the CommentsPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
+
+
 
 @IonicPage()
 @Component({
@@ -40,27 +41,28 @@ export class CommentsPage {
 
   user;
   postId: any;
-  posts:  IPosts[] = [];
+  posts:  IAllPosts[] = [];
+  postInfo = <CommentPost>{};
   postItem: any;
   isIndexed: string;
   isRemoveFromSlice: string;
 
-  public postObj : any;
-  public userObj : any;
-  public profilePic : string;
-  public isPostInWishlist: boolean;
-  public likesCount : number;
-  public isPostLiked : boolean;
-  public dislikesCount : number;
-  public isPostDisliked : boolean;
+  // public postObj : any;
+  // public userObj : any;
+  // public profilePic : string;
+  // public isPostInWishlist: boolean;
+  // public likesCount : number;
+  // public isPostLiked : boolean;
+  // public dislikesCount : number;
+  // public isPostDisliked : boolean;
   public commentsCount : number;
-  public postImage: string;
+  // public postImage: string;
 
-  public comments: IComment[] = [];
+  public comments: IComments[] = [];
 
   // Order By Variables
-  order: string = 'id';
-  reverse: boolean = false;
+  // order: string = 'id';
+  // reverse: boolean = false;
 
   commentInput: string;
 
@@ -70,8 +72,8 @@ export class CommentsPage {
               public phpService: PhpServiceProvider,
               public alertCtrl: AlertController,
               public actionSheetCtrl: ActionSheetController,
-              private orderPipe: OrderPipe,
-              public loadingCtrl: LoadingController ) {
+              public loadingCtrl: LoadingController,
+              public toastCtrl: ToastController ) {
     
     this.user = firebase.auth().currentUser; 
     
@@ -82,98 +84,137 @@ export class CommentsPage {
     this.isRemoveFromSlice = this.navParams.get('removeFromList');
   }
 
-  //ionViewWillEnter()
-  ionViewDidLoad()
+  ionViewWillEnter()
   {   
-    this.loadpostInfo();
+    this.comments.length = 0;
+    //this.loadpostInfo();
     this.loadAllComments(this.postId);
   }
 
-  loadpostInfo(){
+  // loadpostInfo(){
 
-    let loader = this.loadingCtrl.create({
-      content: "fetching..."
-    });
-    loader.present();
+  //   let loader = this.loadingCtrl.create({
+  //     content: "fetching..."
+  //   });
+  //   loader.present();
 
-    this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{ 
-      this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
-        this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {
-          this.phpService.getWishlistFromUserId(this.user.uid).subscribe(wishlistInfo => {   
-            this.phpService.getlikesCount(postInfo.ID).subscribe(likesCount => {
-              this.phpService.getdislikesCount(postInfo.ID).subscribe(dislikesCount => {
-                this.phpService.getlikeInfoPerUser(this.user.uid, this.postId).subscribe(userLikeInfo => {
-                  this.phpService.getDislikeInfoPerUser(this.user.uid, postInfo.ID).subscribe(userDislikeInfo => {
-                  this.phpService.getCountOfComments(postInfo.ID).subscribe(commentsCount => {
-                    this.phpService.getPostImages(postInfo.ID).subscribe(postImages => {
+  //   this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{ 
+  //     this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
+  //       this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {
+  //         this.phpService.getWishlistFromUserId(this.user.uid).subscribe(wishlistInfo => {   
+  //           this.phpService.getlikesCount(postInfo.ID).subscribe(likesCount => {
+  //             this.phpService.getdislikesCount(postInfo.ID).subscribe(dislikesCount => {
+  //               this.phpService.getlikeInfoPerUser(this.user.uid, this.postId).subscribe(userLikeInfo => {
+  //                 this.phpService.getDislikeInfoPerUser(this.user.uid, postInfo.ID).subscribe(userDislikeInfo => {
+  //                 this.phpService.getCountOfComments(postInfo.ID).subscribe(commentsCount => {
+  //                   this.phpService.getPostImages(postInfo.ID).subscribe(postImages => {
 
-                        // Check post is liked by loggedin User or not
-                        let isLiked = false;
-                        if( userLikeInfo === 0 ){
-                        }else{
-                          isLiked = true;
-                        }
+  //                       // Check post is liked by loggedin User or not
+  //                       let isLiked = false;
+  //                       if( userLikeInfo === 0 ){
+  //                       }else{
+  //                         isLiked = true;
+  //                       }
 
-                        // Check post is liked by loggedin User or not
-                        let isDisliked = false;
-                        if( userDislikeInfo === 0 ){
-                        }else{
-                          isDisliked = true;
-                        }
+  //                       // Check post is liked by loggedin User or not
+  //                       let isDisliked = false;
+  //                       if( userDislikeInfo === 0 ){
+  //                       }else{
+  //                         isDisliked = true;
+  //                       }
 
-                        // Get Wishlist information
-                        let isInWishlist = false;
+  //                       // Get Wishlist information
+  //                       let isInWishlist = false;
 
-                        if( wishlistInfo.length === 0 ){
-                        } else {
-                          wishlistInfo.forEach(wishObj=>{
+  //                       if( wishlistInfo.length === 0 ){
+  //                       } else {
+  //                         wishlistInfo.forEach(wishObj=>{
                 
-                            if(wishObj.PostId === this.postId){
-                              isInWishlist = true;
-                            }    
-                          });
-                        }
+  //                           if(wishObj.PostId === this.postId){
+  //                             isInWishlist = true;
+  //                           }    
+  //                         });
+  //                       }
 
-                        // Check each post has Image or not
-                        let postImage;
-                        if(postImages != false){
-                          postImage = constants.baseURI + postImages.images_path;
-                        }
+  //                       // Check each post has Image or not
+  //                       let postImage;
+  //                       if(postImages != false){
+  //                         postImage = constants.baseURI + postImages.images_path;
+  //                       }
 
-                        this.postObj          = postInfo;
-                        this.userObj          = userinfo;
-                        this.profilePic       = constants.baseURI + userProfilePic.images_path;
-                        this.isPostInWishlist = isInWishlist;
-                        this.likesCount       = likesCount;
-                        this.isPostLiked      = isLiked;
-                        this.dislikesCount    = dislikesCount;
-                        this.isPostDisliked   = isDisliked;
-                        this.commentsCount    = commentsCount;
-                        this.postImage        = postImage;
+  //                       this.postObj          = postInfo;
+  //                       this.userObj          = userinfo;
+  //                       this.profilePic       = constants.baseURI + userProfilePic.images_path;
+  //                       this.isPostInWishlist = isInWishlist;
+  //                       this.likesCount       = likesCount;
+  //                       this.isPostLiked      = isLiked;
+  //                       this.dislikesCount    = dislikesCount;
+  //                       this.isPostDisliked   = isDisliked;
+  //                       this.commentsCount    = commentsCount;
+  //                       this.postImage        = postImage;
 
-                        loader.dismiss();
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    });
+  //                       loader.dismiss();
+  //                     });
+  //                   });
+  //                 });
+  //               });
+  //             });
+  //           });
+  //         });
+  //       });
+  //     });
+  //   });
 
     
-  }
+  // }
 
   // Retrieve the JSON encoded data from the remote server
   // Using Angular's Http class and an Observable - then
   // assign this to the items array for rendering to the HTML template
   loadAllComments(postId)
   {
+    let hasPostInfo: boolean = false;
     this.comments = [];
 
-   this.phpService.getAllComments(postId).subscribe(commentsInfo => {
+    this.phpService.getAllComments(postId, this.user.uid).subscribe(commentsdata => {
+      commentsdata.forEach(comment => {
+
+        // Check each post has Image or not
+        let postImage;
+        if(comment.postimg != null){
+          postImage = constants.baseURI + comment.postimg;
+        }
+
+        if(hasPostInfo == false){
+          console.log('Inside haspostinfo: '+ hasPostInfo);
+          this.postInfo.postId             = comment.postId;
+          this.postInfo.postImage          = postImage;
+          this.postInfo.postByName         = comment.postbyname;
+          this.postInfo.postedByProfilePic = constants.baseURI + comment.postUserProfilepic;
+          this.postInfo.post               = comment.post;
+          this.postInfo.postedDate         = comment.posteddate;
+          this.postInfo.postedById         = comment.postedby;
+          this.postInfo.isWished           = comment.isWished;
+          this.postInfo.likesCount         = comment.likesCount;
+          this.postInfo.dislikesCount      = comment.dislikesCount;
+          this.postInfo.commentsCount      = comment.commentsCount;
+          this.postInfo.isLiked            = comment.isLiked;
+          this.postInfo.isdisLiked         = comment.isdisLiked;
+          hasPostInfo                      = true;
+        }
+
+        this.comments.push({
+          "id"                    : comment.ID,
+          "comment"               : comment.comment,
+          "commentedById"         : comment.commentedBy,
+          "commentedDate"         : comment.commentedDate,
+          "commentedByName"       : comment.commentedbyname,
+          "commentedByProfilePic" : constants.baseURI + comment.commentedbypic
+        });
+      });
+    });
+
+   /*this.phpService.getAllComments(postId).subscribe(commentsInfo => {
 
         if( commentsInfo.length === 0 ){
           console.log('***Empty Comments');
@@ -198,7 +239,7 @@ export class CommentsPage {
           });
           this.comments = this.orderPipe.transform(this.comments, 'id');
         }
-      });
+      });*/
   }
 
   // Add Comments
@@ -209,7 +250,7 @@ export class CommentsPage {
       this.commentInput = '';
       this.loadAllComments(this.postId);
 
-      this.commentsCount += 1;
+      this.postInfo.commentsCount += 1;
 
       if(this.isIndexed === 'UpdateIndex'){
         var index = this.posts.indexOf(this.postItem);
@@ -272,7 +313,7 @@ export class CommentsPage {
                 .subscribe(res => {
                   this.loadAllComments(this.postId);
 
-                  this.commentsCount -= 1;
+                  this.postInfo.commentsCount -= 1;
 
                   if(this.isIndexed === 'UpdateIndex'){
                     var index = this.posts.indexOf(this.postItem);
@@ -288,7 +329,7 @@ export class CommentsPage {
 
   // Pull to Refresh functionality
   dorefresh(refresher) {
-    this.loadpostInfo();
+    //this.loadpostInfo();
     this.loadAllComments(this.postId);
     if(refresher != 0)
       refresher.complete();
@@ -308,29 +349,43 @@ export class CommentsPage {
   }
 
   // Add Wishlist
-  addToWishlist(){
+  addToWishlist(commentItem: any){
     this.phpService.addWishlist(this.user.uid, this.postId).subscribe(wishlistInfo => {
-      this.isPostInWishlist = true;
+
+      this.postInfo.isWished = 1;
 
       if(this.isIndexed === 'UpdateIndex'){
         var index = this.posts.indexOf(this.postItem);
-        this.posts[index].addedToWishlist = true;
+        this.posts[index].isWished = 1;
+
+        let toast = this.toastCtrl.create({
+          message: `Added to your wishlist!`,
+          duration: 2000
+        });
+        toast.present();
       }
     });
   }
 
   // Remove Wishlist
-  removeFromWishlist(){
+  removeFromWishlist(commentItem: any){
     this.phpService.deleteWishlist(this.user.uid, this.postId).subscribe(wishlistInfo => {
-      this.isPostInWishlist = false;
+
+      this.postInfo.isWished = 0;
 
       if(this.isIndexed === 'UpdateIndex'){
         var index = this.posts.indexOf(this.postItem);
-        this.posts[index].addedToWishlist = false;
+        this.posts[index].isWished = 0;
 
         if(this.isRemoveFromSlice === 'RemoveSlice'){
           if (index !== -1) {
             this.posts.splice(index, 1);
+
+            let toast = this.toastCtrl.create({
+              message: `Removed from your wishlist!`,
+              duration: 2000
+            });
+            toast.present();
           }
         }
       }
@@ -338,74 +393,78 @@ export class CommentsPage {
   }
 
   // Add Like
-  addLike(){
+  addLike(commentItem: any){
     
     this.phpService.addLike(this.user.uid, this.postId).subscribe(likeInfo => {
-      this.likesCount += 1;
-      this.isPostLiked = true;  
+
+      this.postInfo.likesCount += 1;
+      this.postInfo.isLiked = 1;
 
       if(this.isIndexed === 'UpdateIndex'){
         var index = this.posts.indexOf(this.postItem);
-        this.posts[index].likesCount = this.likesCount;
-        this.posts[index].isPostLiked =  this.isPostLiked;
+        this.posts[index].likesCount += 1;
+        this.posts[index].isPostLiked = 1;
       }
 
-      this.removeDislike();
+      this.removeDislike(commentItem);
 
     });
   }
 
   // Remove Like
-  removeLike(){
+  removeLike(commentItem: any){
     this.phpService.deleteLike(this.user.uid, this.postId).subscribe(likeInfo => {
-      if( this.likesCount > 0 && this.isPostLiked === true){
-        this.likesCount -= 1;
-        this.isPostLiked = false;
+
+      if( this.postInfo.likesCount > 0 && this.postInfo.isLiked === 1){
+        this.postInfo.likesCount -= 1;
+        this.postInfo.isLiked = 0;
       }
       
       if(this.isIndexed === 'UpdateIndex'){
         var index = this.posts.indexOf(this.postItem);
         if( this.posts[index].likesCount > 0 ){
-          this.posts[index].likesCount = this.likesCount;
+          this.posts[index].likesCount -= 1;
         }
-        this.posts[index].isPostLiked = this.isPostLiked;
+        this.posts[index].isPostLiked = 0;
       }
 
     });
   }
 
   // Add Dislike
-  addDislike(){
+  addDislike(commentItem: any){
     
     this.phpService.addDislike(this.user.uid, this.postId).subscribe(dislikeInfo => {
-      this.dislikesCount += 1;
-      this.isPostDisliked = true;  
+
+      this.postInfo.dislikesCount += 1;
+      this.postInfo.isdisLiked = 1;
 
       if(this.isIndexed === 'UpdateIndex'){
         var index = this.posts.indexOf(this.postItem);
-        this.posts[index].dislikesCount = this.dislikesCount;
-        this.posts[index].isPostDisliked = this.isPostDisliked;
+        this.posts[index].dislikesCount += 1;
+        this.posts[index].isPostDisliked = 1;
       }
 
-      this.removeLike();
+      this.removeLike(commentItem);
 
     });
   }
 
   // Remove Like
-  removeDislike(){
+  removeDislike(commentItem: any){
     this.phpService.deleteDislike(this.user.uid, this.postId).subscribe(dislikeInfo => {
-      if( this.dislikesCount > 0 && this.isPostDisliked === true){
-        this.dislikesCount -= 1;
-        this.isPostDisliked = false;
+
+      if( this.postInfo.dislikesCount > 0 && this.postInfo.isdisLiked === 1){
+        this.postInfo.dislikesCount -= 1;
+        this.postInfo.isdisLiked = 0;
       }
 
       if(this.isIndexed === 'UpdateIndex'){
         var index = this.posts.indexOf(this.postItem);
         if( this.posts[index].dislikesCount > 0 ){
-          this.posts[index].dislikesCount = this.dislikesCount;
+          this.posts[index].dislikesCount -= 1;
         }
-        this.posts[index].isPostDisliked = this.isPostDisliked;
+        this.posts[index].isPostDisliked = 0;
       }
 
     });
@@ -426,12 +485,9 @@ export class CommentsPage {
   }
 
   resize() {
-    //this.myInput.nativeElement.style.height = this.myInput.nativeElement.scrollHeight + 'px';
     var element = this.myInput['_elementRef'].nativeElement.getElementsByClassName("text-input")[0];
     var scrollHeight = element.scrollHeight;
     element.style.height = scrollHeight + 'px';
     this.myInput['_elementRef'].nativeElement.style.height = (scrollHeight + 16) + 'px';
   } 
-
-
 }

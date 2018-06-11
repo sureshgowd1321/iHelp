@@ -25,50 +25,50 @@
     <ion-item>
 
       <ion-avatar item-left>
-        <img src="{{ profilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)">
+        <img src="{{ postInfo?.postedByProfilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)">
       </ion-avatar>
 
-      <ion-avatar item-right (click)="addToWishlist()" *ngIf="postObj?.CreatedById != user.uid && !isPostInWishlist">
+      <ion-avatar item-right (click)="addToWishlist()" *ngIf="postInfo?.postedById != user.uid && postInfo?.isWished == 0">
         <ion-icon name="ios-heart-outline"></ion-icon>
       </ion-avatar>
 
-      <ion-avatar item-right (click)="removeFromWishlist()" *ngIf="postObj?.CreatedById != user.uid && isPostInWishlist">
+      <ion-avatar item-right (click)="removeFromWishlist()" *ngIf="postInfo?.postedById != user.uid && postInfo?.isWished == 1">
         <ion-icon name="ios-heart"></ion-icon>
       </ion-avatar>
 
       <a class="text-primary">
-        <h2> {{ userObj?.name }} </h2>
-        <p> {{ postObj?.CreatedDate | date: 'medium' }} </p>
+        <h2> {{ postInfo?.postByName }} </h2>
+        <p> {{ postInfo?.postedDate }} </p>
       </a>
 
     </ion-item>
 
     <ion-card-content>
-      <p> {{ postObj?.post }} </p>
+      <p> {{ postInfo?.post }} </p>
       <p>
-        <img src="{{ this.postImage }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="this.postImage !== null"> </p>
+        <img src="{{ postInfo?.postImage }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="postInfo?.postImage !== null"> </p>
     </ion-card-content>
 
     <ion-row>
       <ion-col>
-        <button ion-button icon-left clear small (click)="addLike()" *ngIf="!isPostLiked">
+        <button ion-button icon-left clear small (click)="addLike()" *ngIf="postInfo?.isLiked == 0">
           <ion-icon name="ios-thumbs-up-outline"></ion-icon>
           <div>Like</div>
         </button>
 
-        <button ion-button icon-left clear small (click)="removeLike()" *ngIf="isPostLiked">
+        <button ion-button icon-left clear small (click)="removeLike()" *ngIf="postInfo?.isLiked == 1">
           <ion-icon name="thumbs-up"></ion-icon>
           <div>Like</div>
         </button>
       </ion-col>
 
       <ion-col>
-        <button ion-button icon-left clear small (click)="addDislike()" *ngIf="!isPostDisliked">
+        <button ion-button icon-left clear small (click)="addDislike()" *ngIf="postInfo?.isdisLiked == 0">
           <ion-icon name="ios-thumbs-down-outline"></ion-icon>
           <div>Dislike</div>
         </button>
 
-        <button ion-button icon-left clear small (click)="removeDislike()" *ngIf="isPostDisliked">
+        <button ion-button icon-left clear small (click)="removeDislike()" *ngIf="postInfo?.isdisLiked == 1">
           <ion-icon name="thumbs-down"></ion-icon>
           <div>Dislike</div>
         </button>
@@ -77,50 +77,50 @@
 
   </ion-card>
 
-  <button ion-button icon-left clear small (click)="gotoLikesPage(postId)">
+  <button ion-button icon-left clear small (click)="gotoLikesPage(postInfo?.postId)">
     <ion-icon name="ios-thumbs-up"></ion-icon>
     <div>
-      <u> {{ likesCount }} </u>
+      <u> {{ postInfo?.likesCount }} </u>
     </div>
   </button>
 
-  <button ion-button icon-left clear small (click)="gotoDislikesPage(postId)">
+  <button ion-button icon-left clear small (click)="gotoDislikesPage(postInfo?.postId)">
       <ion-icon name="ios-thumbs-down"></ion-icon>
       <div>
-        <u> {{ dislikesCount }} </u>
+        <u> {{ postInfo?.dislikesCount }} </u>
       </div>
     </button>
 
   <button ion-button icon-left clear small>
     <ion-icon name="text" icon-left></ion-icon>
     <div>
-      <u> {{ commentsCount }} Comments </u>
+      <u> {{ postInfo?.commentsCount }} Comments </u>
     </div>
   </button>
 
-  <p padding *ngIf="comments.length === 0"> Be the first person to comment </p>
+  <p padding *ngIf="postInfo?.commentsCount === 0"> Be the first person to comment </p>
 
-  <ion-list *ngIf="comments.length > 0">
+  <ion-list *ngIf="postInfo?.commentsCount > 0">
     <!-- <ion-list-header> -->
       <h6>Comments</h6>
     <!-- </ion-list-header> -->
 
-    <ion-item-sliding *ngFor="let comment of comments | orderBy: order:reverse:'case-insensitive'">
+    <ion-item-sliding *ngFor="let comment of comments">
       <ion-item class="item-icon-left" text-wrap>
         <ion-avatar item-left>
-          <img src="{{ comment.profilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)">
+          <img src="{{ comment.commentedByProfilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)">
         </ion-avatar>
 
         <a class="text-primary">
-          <h2 (click)="gotoUsersPage(comment.commentedBy)" class="labelStyle"> {{comment.name}}</h2>
-          <p> {{comment.commentedDate | date: 'medium' }} </p>
+          <h2 (click)="gotoUsersPage(comment.commentedById)" class="labelStyle"> {{comment.commentedByName}}</h2>
+          <p> {{ comment.commentedDate }} </p>
         </a>
 
         {{comment.comment}}
 
       </ion-item>
 
-      <ion-item-options side="right" *ngIf="comment.commentedBy === user.uid">
+      <ion-item-options side="right" *ngIf="comment.commentedById === user.uid">
         <button color="danger" ion-button (click)="deleteComment(comment.id)">
           <ion-icon name="trash"> Delete</ion-icon>
         </button>
