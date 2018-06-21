@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ActionSheetController, ToastController } from 'ionic-angular';
 import * as firebase from 'firebase/app'; 
 
 // Interfaces
-import { IPosts } from '../../providers/interface/interface';
+import { IAllPosts } from '../../providers/interface/interface';
 
 // Providers
 import { PhpServiceProvider } from '../../providers/php-service/php-service';
@@ -15,9 +15,6 @@ import { constants } from '../../constants/constants';
 //Pages
 import { EditPostPage } from '../edit-post/edit-post';
 import { CommentsPage } from '../comments/comments';
-
-// Order Pipe
-import { OrderPipe } from 'ngx-order-pipe';
 
 /**
  * Generated class for the UserPostsPage page.
@@ -34,16 +31,8 @@ import { OrderPipe } from 'ngx-order-pipe';
 export class UserPostsPage {
 
   public loggedInUser;
-  public posts: IPosts[] = [];
+  public posts: IAllPosts[] = [];
   public userUId: string;
-
-  // Variables to pass comments page
-  postId: any;
-  postItem: any;
-
-  // Order By Variables
-  order: string = 'id';
-  reverse: boolean = true;
 
   // Pagination Variables
   page = 1;
@@ -58,7 +47,7 @@ export class UserPostsPage {
               public actionSheetCtrl: ActionSheetController,
               public phpService: PhpServiceProvider,
               public alertCtrl: AlertController,
-              private orderPipe: OrderPipe) {
+              public toastCtrl: ToastController) {
 
     this.loggedInUser = firebase.auth().currentUser.uid; 
     
@@ -73,99 +62,46 @@ export class UserPostsPage {
   }
 
   loadPosts(infiniteScroll?){
-    this.phpService.getPostsFromUserId(this.page, this.userUId).subscribe(postdata => {
-
+    this.phpService.getPostsFromUserId(this.loggedInUser, this.userUId, this.page).subscribe(postdata => {
       postdata.forEach(postInfo => {
 
-        this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
-          this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {                        
-            this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(userLocationInfo => {                         
-              this.phpService.getlikesCount(postInfo.ID).subscribe(likesCount => {
-                this.phpService.getdislikesCount(postInfo.ID).subscribe(dislikesCount => {
-                  this.phpService.getlikeInfoPerUser(this.loggedInUser, postInfo.ID).subscribe(userLikeInfo => {
-                    this.phpService.getDislikeInfoPerUser(this.loggedInUser, postInfo.ID).subscribe(userDislikeInfo => {
-                      this.phpService.getWishlistFromUserId(this.loggedInUser).subscribe(wishlistInfo => {                                
-                        this.phpService.getCountOfComments(postInfo.ID).subscribe(commentsCount => {
-                          this.phpService.getPostImages(postInfo.ID).subscribe(postImages => {
+        // Check each post has Image or not
+        let postImage;
+        if(postInfo.images_path != null){
+          postImage = constants.baseURI + postInfo.images_path;
+        }
 
-                            // Check post is liked by loggedin User or not
-                            let isPostLiked = false;
-                            if( userLikeInfo === 0 ){
-                            }else{
-                              isPostLiked = true;
-                            }
+        let postStr = this.phpService.findAndReplace(postInfo.post, "&#39;", "'");
+        postStr = this.phpService.findAndReplace(postStr, "&#34;", "\"");
 
-                            // Check post is Disliked by loggedin User or not
-                            let isPostDisliked = false;
-                            if( userDislikeInfo === 0 ){
-                            }else{
-                              isPostDisliked = true;
-                            }
-
-                            // Check post is added to wishlist or not
-                            let isPostInWishlist = false;
-                            if( wishlistInfo.length === 0 ){
-                            } else {
-                              wishlistInfo.forEach(wishObj=>{
-                    
-                                if(wishObj.PostId === postInfo.ID){
-                                  isPostInWishlist = true;
-                                }    
-                              });
-                            }
-
-                            // Check each post has Image or not
-                            let postImage;
-                            if(postImages != false){
-                              postImage = constants.baseURI + postImages.images_path;
-                            }
-
-                            this.posts.push(
-                              {
-                                "id"           : postInfo.ID,
-                                "post"         : postInfo.post,
-                                "createdDate"  : postInfo.CreatedDate,
-                                "createdById"  : postInfo.CreatedById,
-                                "name"         : userinfo.name,
-                                "email"        : userinfo.email,
-                                "nickname"     : userinfo.nickname,
-                                "city"         : userLocationInfo.City,
-                                "state"        : userLocationInfo.State,
-                                "country"      : userLocationInfo.Country,
-                                "profilePic"   : constants.baseURI + userProfilePic.images_path,
-                                "wishId"       : wishlistInfo.id,
-                                "addedToWishlist" : isPostInWishlist,
-                                "likesCount"      : likesCount,
-                                "dislikesCount"   : dislikesCount,
-                                "isPostLiked"     : isPostLiked,
-                                "isPostDisliked"  : isPostDisliked,
-                                "commentsCount"   : commentsCount,
-                                "postImages"      : postImage
-                              }
-                            );
-                          });
-                        });
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
+        this.posts.push(
+          {
+            "id"            : postInfo.ID,
+            "post"          : postStr,
+            "createdDate"   : postInfo.PostedDate,
+            "name"          : postInfo.name,
+            "profilePic"    : constants.baseURI + postInfo.ProfilePicURL,
+            "createdById"   : postInfo.CreatedById,
+            "postImages"    : postImage,
+            "likesCount"    : postInfo.likesCount,
+            "dislikesCount" : postInfo.dislikesCount,
+            "commentsCount" : postInfo.commentsCount,
+            "isPostLiked"   : postInfo.isLiked,
+            "isPostDisliked": postInfo.isdisLiked,
+            "isWished"      : postInfo.isWished
+          }
+        );
       });
-      this.posts = this.orderPipe.transform(this.posts, 'id');
-
-      if (infiniteScroll) {
-        infiniteScroll.complete();
-      }
     });
   }
 
   loadMore(infiniteScroll){
     this.page++;
 
-    this.loadPosts(infiniteScroll);
+    setTimeout(() => {
+      this.loadPosts(infiniteScroll);
+      infiniteScroll.complete();
+    }, 500);
 
     if (this.page === this.maximumPages) {
       infiniteScroll.enable(false);
@@ -183,7 +119,7 @@ export class UserPostsPage {
   }
 
     // Goto Comments Page
-    gotoCommentsPage(postId: any, posts: IPosts[], postItem: any) {
+    gotoCommentsPage(postId: any, posts: IAllPosts[], postItem: any) {
       let updateIndex = 'UpdateIndex';
       this.navCtrl.push(CommentsPage, {
         postId, posts, postItem, updateIndex
@@ -203,7 +139,7 @@ export class UserPostsPage {
     }
 
     // Action sheet on each post to modify/delete your post
-    modifyCardActionSheet(postId: any, posts: IPosts[], postItem: any) {
+    modifyCardActionSheet(postId: any, posts: IAllPosts[], postItem: any) {
       let actionSheet = this.actionSheetCtrl.create({
         //title: 'Modify your album',
         buttons: [
@@ -234,7 +170,7 @@ export class UserPostsPage {
     }
 
      // Go to Edit Post Page to update the post
-    gotoEditPostPage(postId: any, posts: IPosts[], postItem: any) {
+    gotoEditPostPage(postId: any, posts: IAllPosts[], postItem: any) {
       this.navCtrl.push(EditPostPage, {
         postId, posts, postItem
       });
@@ -289,7 +225,7 @@ export class UserPostsPage {
       this.phpService.addLike(this.loggedInUser, postId).subscribe(likeInfo => {
         var index = this.posts.indexOf(postItem);
         this.posts[index].likesCount += 1;
-        this.posts[index].isPostLiked = true;
+        this.posts[index].isPostLiked = 1;
 
         this.removeDislike(postId, postItem);
 
@@ -300,9 +236,9 @@ export class UserPostsPage {
     removeLike(postId: any, postItem: any){
       this.phpService.deleteLike(this.loggedInUser, postId).subscribe(likeInfo => {
         var index = this.posts.indexOf(postItem);
-        if( this.posts[index].likesCount > 0 && this.posts[index].isPostLiked === true){
+        if( this.posts[index].likesCount > 0 && this.posts[index].isPostLiked === 1){
           this.posts[index].likesCount -= 1;
-          this.posts[index].isPostLiked = false;
+          this.posts[index].isPostLiked = 0;
         }
       });
     }
@@ -312,7 +248,7 @@ export class UserPostsPage {
       this.phpService.addDislike(this.loggedInUser, postId).subscribe(dislikeInfo => {
         var index = this.posts.indexOf(postItem);
         this.posts[index].dislikesCount += 1;
-        this.posts[index].isPostDisliked = true;
+        this.posts[index].isPostDisliked = 1;
 
         this.removeLike(postId, postItem);
       });
@@ -322,9 +258,9 @@ export class UserPostsPage {
     removeDislike(postId: any, postItem: any){
       this.phpService.deleteDislike(this.loggedInUser, postId).subscribe(dislikeInfo => {
         var index = this.posts.indexOf(postItem);
-        if( this.posts[index].dislikesCount > 0 && this.posts[index].isPostDisliked === true){
+        if( this.posts[index].dislikesCount > 0 && this.posts[index].isPostDisliked === 1){
           this.posts[index].dislikesCount -= 1;
-          this.posts[index].isPostDisliked = false;
+          this.posts[index].isPostDisliked = 0;
         }  
       });
     }
@@ -333,7 +269,14 @@ export class UserPostsPage {
     addToWishlist(postId: any, postItem: any){
       this.phpService.addWishlist(this.loggedInUser, postId).subscribe(wishlistInfo => {
         var index = this.posts.indexOf(postItem);
-        this.posts[index].addedToWishlist = true;
+        this.posts[index].isWished = 1;
+
+        let toast = this.toastCtrl.create({
+          message: `Added to your wishlist!`,
+          duration: 2000
+        });
+        toast.present();
+
       });
     }
 
@@ -341,7 +284,14 @@ export class UserPostsPage {
     removeFromWishlist(postId: any, postItem: any){
       this.phpService.deleteWishlist(this.loggedInUser, postId).subscribe(wishlistInfo => {
         var index = this.posts.indexOf(postItem);
-        this.posts[index].addedToWishlist = false;
+        this.posts[index].isWished = 0;
+
+        let toast = this.toastCtrl.create({
+          message: `Added to your wishlist!`,
+          duration: 2000
+        });
+        toast.present();
+
       });
     }
 

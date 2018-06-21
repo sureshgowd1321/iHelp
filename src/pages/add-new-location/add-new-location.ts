@@ -56,4 +56,8 @@ export class AddNewLocationPage {
     }
   }
 
+  goBack(): void {
+	  this.navCtrl.pop();
+  }
+
 }

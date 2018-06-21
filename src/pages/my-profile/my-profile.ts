@@ -17,6 +17,9 @@ import { EditProfilePage } from '../edit-profile/edit-profile';
 import { PhpServiceProvider } from '../../providers/php-service/php-service';
 import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 
+// Interfaces
+import { IHelpUser } from '../../providers/interface/interface';
+
 /**
  * Generated class for the MyProfilePage page.
  *
@@ -32,15 +35,7 @@ import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 export class MyProfilePage {
 
   user;
-
-  nameVar: string;
-  genderVar: string;
-  cityVar: string;
-  stateVar: string;
-  countryVar: string;
-  emailVar: string;
-  userProfilePic: string;
-  userUid: string;
+  userInfo = <IHelpUser>{};
 
   constructor(public _app: App,
               private profileData: ProfileDataProvider, 
@@ -55,21 +50,15 @@ export class MyProfilePage {
 
   ionViewWillEnter(){    
     this.phpService.getUserInfo(this.user.uid).subscribe(userinfo => {
-      this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(locationinfo => {
-        this.phpService.getUserProfilePic(this.user.uid).subscribe(userProfilePic => {
-
-          this.userUid = userinfo.userUid;
-          this.genderVar = userinfo.Gender;
-          this.nameVar = userinfo.name;
-          this.emailVar = userinfo.email;
-          this.countryVar = locationinfo.Country;
-          this.stateVar = locationinfo.State;
-          this.cityVar = locationinfo.City;
-          this.userProfilePic = constants.baseURI + userProfilePic.images_path;
-
-        });
-      }); 
-    });  
+      this.userInfo.uid        = userinfo.userUid;
+      this.userInfo.email      = userinfo.email;
+      this.userInfo.name       = userinfo.name;
+      this.userInfo.gender     = userinfo.Gender;
+      this.userInfo.profilepic = constants.baseURI + userinfo.ProfilePicURL;
+      this.userInfo.city       = userinfo.City;
+      this.userInfo.state      = userinfo.State;
+      this.userInfo.country    = userinfo.Country;
+    });
   }
 
   // Display Image in Full Screen  

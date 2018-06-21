@@ -12,6 +12,7 @@ import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 
 // Interfaces
 import { ICountries } from '../../providers/interface/interface';
+import { IHelpUser } from '../../providers/interface/interface';
 
 // Native Plugins
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
@@ -35,6 +36,7 @@ import { AddNewLocationPage } from '../add-new-location/add-new-location';
 export class EditProfilePage {
 
   user;
+  userInfo = <IHelpUser>{};
 
   allLocations: ICountries[] = [];
   countries: any = [];
@@ -68,25 +70,34 @@ export class EditProfilePage {
 
   ionViewWillEnter()
   {  
-
     this.phpService.getUserInfo(this.user.uid).subscribe(userinfo => {
-      this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(locationinfo => {
-        this.phpService.getUserProfilePic(this.user.uid).subscribe(userProfilePic => {
+      // this.userInfo.uid        = userinfo.userUid;
+      // this.userInfo.email      = userinfo.email;
+      this.updatedName       = userinfo.name;
+      this.updatedGender     = userinfo.Gender;
+      this.userProfilePic = constants.baseURI + userinfo.ProfilePicURL;
+      this.userCity       = userinfo.City;
+      this.userState      = userinfo.State;
+      this.userCountry    = userinfo.Country;
+      // this.userInfo.postalCode = userinfo.PostalCode;
 
-          this.updatedName = userinfo.name;
-          this.updatedGender = userinfo.Gender;
-          this.userCountry = locationinfo.Country;
-          this.userState = locationinfo.State;
-          this.userCity = locationinfo.City;
-          this.userProfilePic = constants.baseURI + userProfilePic.images_path;
-
-          this.selectedCountry = locationinfo.Country;
-          this.selectedState = locationinfo.State;
-          this.selectedCity = locationinfo.City;
-
-        });
-      }); 
+      this.selectedCountry = userinfo.Country;
+      this.selectedState   = userinfo.State;
+      this.selectedCity    = userinfo.City;
     });
+    /*this.phpService.getUserInfo(this.user.uid).subscribe(userinfo => {
+
+      this.updatedName    = userinfo.name;
+      this.updatedGender  = userinfo.Gender;
+      this.userProfilePic = constants.baseURI + userinfo.ProfilePicURL;
+      this.userCity       = userinfo.City;
+      this.userState      = userinfo.State;
+      this.userCountry    = userinfo.Country;
+
+      this.selectedCountry = userinfo.Country;
+      this.selectedState   = userinfo.State;
+      this.selectedCity    = userinfo.City;
+    });*/
    
     this.phpService.getAllCountries().subscribe(countriesInfo => {
       countriesInfo.forEach(countryObj=>{
@@ -105,56 +116,55 @@ export class EditProfilePage {
           this.countries.push(countryObj.Country);   
         }
       });
-    }); 
+    });
   }
 
   // Set State values based on selected country
   setStateValues() {
-      this.selectedStates.length = 0;
-      this.selectedCities.length = 0;
-      this.selectedState = '';
-      this.selectedCity = '';
-
-      this.allLocations.forEach(stateObj => {
-        if(stateObj.country === this.selectedCountry.trim()){
-
-          var index = this.selectedStates.findIndex(item => item === stateObj.state);
-
-          if (index > -1){
-          } else {  
-            this.selectedStates.push(stateObj.state);   
-          }          
-        }
-      });     
-  }
-
-  // Set Cities based in selected state
-  setCityValues() {
+    this.selectedStates.length = 0;
     this.selectedCities.length = 0;
+    this.selectedState = '';
     this.selectedCity = '';
 
-    this.allLocations.forEach(cityObj => {
-      if(cityObj.state === this.selectedState.trim()){
+    this.allLocations.forEach(stateObj => {
+      if(stateObj.country === this.selectedCountry.trim()){
 
-        var index = this.selectedCities.findIndex(item => item === cityObj.city);
+        var index = this.selectedStates.findIndex(item => item === stateObj.state);
 
         if (index > -1){
         } else {  
-          this.selectedCities.push(cityObj.city);   
+          this.selectedStates.push(stateObj.state);   
         }          
       }
     });     
-  }
+}
 
-  goToProfilePage(): void {
-    this.phpService.getLocationId(this.selectedCity, this.selectedState, this.selectedCountry).subscribe(locationInfo => {
-        this.phpService.updateUserData(this.user.uid, this.updatedName, this.updatedGender, locationInfo.ID).subscribe(locationInfo => {
-          this.navCtrl.pop();
-        });
-    });
-	  
-  }
+// Set Cities based in selected state
+setCityValues() {
+  this.selectedCities.length = 0;
+  this.selectedCity = '';
 
+  this.allLocations.forEach(cityObj => {
+    if(cityObj.state === this.selectedState.trim()){
+
+      var index = this.selectedCities.findIndex(item => item === cityObj.city);
+
+      if (index > -1){
+      } else {  
+        this.selectedCities.push(cityObj.city);   
+      }          
+    }
+  });     
+}
+
+goToProfilePage(): void {
+  this.phpService.getLocationId(this.selectedCity, this.selectedState, this.selectedCountry).subscribe(locationInfo => {
+      this.phpService.updateUserData(this.user.uid, this.updatedName, this.updatedGender, locationInfo.ID).subscribe(locationInfo => {
+        this.navCtrl.pop();
+      });
+  });
+  
+}
   // Upload Picture From Camera
   public base64Image: string;
 
@@ -180,6 +190,7 @@ export class EditProfilePage {
         let options_file: FileUploadOptions = {
           fileKey: 'file',
           fileName: 'name.jpg',
+          chunkedMode: false,
           params : {'userUid': this.user.uid},
           headers: {}
         }
@@ -220,6 +231,7 @@ export class EditProfilePage {
         let options_file: FileUploadOptions = {
           fileKey: 'file',
           fileName: 'name.jpg',
+          chunkedMode: false,
           params : {'userUid': this.user.uid},
           headers: {}
         }
@@ -246,7 +258,7 @@ export class EditProfilePage {
   {
     this.phpService.getUserProfilePic(this.user.uid)
     .subscribe(userProfilePic => {
-      this.userProfilePic = constants.baseURI + userProfilePic.images_path;
+      this.userProfilePic = constants.baseURI + userProfilePic.ProfilePicURL;
     });
   }
 

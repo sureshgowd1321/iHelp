@@ -28,7 +28,7 @@
 
   <div>
   <!-- Display Image -->
-    <img src="{{ userProfilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)" class="roung-img" > 
+    <img src="{{ userInfo?.profilepic }}" #imageToView (click)="displayImageFullScreen(imageToView)" class="roung-img" > 
   </div>
 
     
@@ -41,7 +41,7 @@
           Name
         </ion-col>
         <ion-col >
-            {{nameVar}}
+            {{userInfo?.name}}
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -55,13 +55,13 @@
           Gender
         </ion-col>
         <ion-col >
-            {{genderVar}}
+            {{userInfo?.gender}}
         </ion-col>
       </ion-row>
     </ion-grid>
   </ion-item>
 
-  <!-- Display City (click)="updateCity()" -->
+  <!-- Display City -->
   <ion-item >
     <ion-grid>
       <ion-row>
@@ -69,13 +69,13 @@
           City
         </ion-col>
         <ion-col >
-            {{cityVar}}
+            {{userInfo?.city}}
         </ion-col>
       </ion-row>
     </ion-grid>
   </ion-item>
 
-  <!-- Display State (click)="updateState()" -->
+  <!-- Display State -->
   <ion-item >
       <ion-grid>
         <ion-row>
@@ -83,13 +83,13 @@
             State
           </ion-col>
           <ion-col >
-              {{stateVar}}
+              {{userInfo?.state}}
           </ion-col>
         </ion-row>
       </ion-grid>
     </ion-item>
 
-  <!-- Display Country (click)="updateCountry()"-->
+  <!-- Display Country -->
   <ion-item >
     <ion-grid>
       <ion-row>
@@ -97,7 +97,7 @@
           Country
         </ion-col>
         <ion-col >
-            {{countryVar}}
+            {{userInfo?.country}}
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -112,31 +112,15 @@
         </ion-col>
         <ion-col class="placeholder-profile">
           <span>
-              {{emailVar}}
+              {{userInfo?.email}}
           </span>
         </ion-col>
       </ion-row>
     </ion-grid>
   </ion-item> 
 
- <!-- <ion-item>
-    <ion-grid>
-      <ion-row>
-        <ion-col width-50 class="labelStyle">
-          Total <ion-icon [style.color]="'red'" name="ios-star" ></ion-icon>
-        </ion-col>
-        <ion-col class="placeholder-profile">
-          <span>
-              <!-- {{userInfo?.totalstars}} -->
-          <!--  {{ (userObj | async)?.totalStars }} 
-          </span>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-item> -->
-
   <!-- Display My Posts  -->
-  <button ion-item (click)="goToMyPosts(userUid)" class="labelStyle">
+  <button ion-item (click)="goToMyPosts(user.uid)" class="labelStyle">
      My Posts
   </button>
 

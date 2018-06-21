@@ -29,16 +29,11 @@ export class PhpServiceProvider {
   }
 
   // Get All Posts
-  getPosts(page: number, postFilter: string, postCity: string, postState: string, postCountry: string, userUid: string, createdDate: string) {
-      return this.http.get(constants.baseURI + 'get-posts.php?page=' + page
-                                        + '&userPostFilter=' + postFilter
-                                        + '&postedCity=' + postCity
-                                        + '&postedState=' + postState
-                                        + '&postedCountry=' + postCountry
-                                        + '&userUid=' + userUid
-                                        + '&userCreatedDate=' + createdDate)
+  getAllPosts(userUid: string, page: number){
+    return this.http.get(constants.baseURI + 'get-all-posts.php?userUid='+userUid
+                                          + '&page=' + page)
       .map(response => response.json());
-    } 
+  }
 
   // Get Post Information
   getPostInfo(postId: string) {
@@ -47,33 +42,16 @@ export class PhpServiceProvider {
   }
 
   // Get All Posts from User Id
-  getPostsFromUserId(page: number, userUid: string) {
-    return this.http.get(constants.baseURI + 'getPostsFromUserId.php?userUid='+userUid
-                                      + '&page=' + page)
-    .map(response => response.json());
-  }
-
-  // Get Images from Post
-  getPostImages(id: string) {
-    return this.http.get(constants.baseURI + 'get-Post-Images.php?postId='+id)
+  getPostsFromUserId(loggedInUserId: string, postUserId: string, page: number) {
+    return this.http.get(constants.baseURI + 'getPostsFromUserId.php?loggedUserId='+loggedInUserId
+                                      + '&postUserId=' + postUserId + '&page=' + page)
     .map(response => response.json());
   }
 
   // Get All Comments per post
-  getAllComments(postId: string) {
-    return this.http.get(constants.baseURI + 'get-all-comments.php?key=totalCommentsPerPost&postId='+postId)
-    .map(response => response.json());
-  }
-
-  // Get Count of Comments per post
-  getCountOfComments(postId: string) {
-    return this.http.get(constants.baseURI + 'get-all-comments.php?key=countOfCommentsPerPost&postId='+postId)
-    .map(response => response.json());
-  }
-
-  // Get Location from Location Id
-  getLocationInfo(locationId: string) {
-    return this.http.get(constants.baseURI + 'getLocationsFromId.php?locationId='+locationId)
+  getAllComments(postId: string, userId: string) {
+    return this.http.get(constants.baseURI + 'get-all-comments.php?postId='+postId
+                                                + '&userId=' + userId)
     .map(response => response.json());
   }
 
@@ -84,45 +62,15 @@ export class PhpServiceProvider {
   }
 
   // Get Wishlist information from User Id
-  getWishlistFromUserId(userUid: string) {
-    return this.http.get(constants.baseURI + 'getWishlistFromUserId.php?userUid=' + userUid)
-    .map(response => response.json());
-  }
-
-  // Get Wishlist information from User Id
   getMyWishlist(page: number, userUid: string) {
     return this.http.get(constants.baseURI + 'get-my-wishlist.php?userUid=' + userUid
                                       + '&page=' + page)
     .map(response => response.json());
   }
 
-  //Get count of Likes for each post
-  getlikesCount(postId: string) {
-    return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=totalLikesCountPerPost&postId=' + postId)
-    .map(response => response.json());
-  }
-
-  //Get count of Dislikes for each post
-  getdislikesCount(postId: string) {
-    return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=totalDislikesCountPerPost&postId=' + postId)
-    .map(response => response.json());
-  }
-
-  //Get like info per user per post
-  getlikeInfoPerUser(userId: string, postId: string) {
-    return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=likesPerUser&userId=' + userId + '&postId=' + postId)
-    .map(response => response.json());
-  }
-
-  //Get Dislike info per user per post
-  getDislikeInfoPerUser(userId: string, postId: string) {
-    return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=dislikesPerUser&userId=' + userId + '&postId=' + postId)
-    .map(response => response.json());
-  }
-
-  //Get like info per user per post
-  getLikesPerPost(postId: string) {
-    return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=totalLikesPerPost&postId=' + postId)
+  //Get count of Likes for each post - new
+  getLikes(postId: string) {
+    return this.http.get(constants.baseURI + 'getCountOfLikes.php?key=totalLikes&postId=' + postId)
     .map(response => response.json());
   }
 
@@ -135,7 +83,8 @@ export class PhpServiceProvider {
   // Get All Countries
   getAllCountries() {
     console.log('Inside PHP:');
-    return this.http.get(constants.baseURI + 'get-all-locations.php?key=countries')
+    //return this.http.get(constants.baseURI + 'get-all-locations.php?key=countries')
+    return this.http.get(constants.baseURI + 'get-all-locations.php')
     .map(response => response.json());
   }
 
@@ -450,6 +399,15 @@ export class PhpServiceProvider {
 
       return this.http.post(url, body, options)
                   .map(response => response.json());
+  }
+
+  // Replace text with another text
+  findAndReplace(string, target, replacement) {
+    var i = 0, length = string.length;
+    for (i; i < length; i++) {
+      string = string.replace(target, replacement);
+    }
+    return string;
   }
 
 }

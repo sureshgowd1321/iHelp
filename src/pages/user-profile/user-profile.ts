@@ -11,6 +11,9 @@ import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 //Pages
 import { UserPostsPage } from '../user-posts/user-posts';
 
+// Interfaces
+import { IHelpUser } from '../../providers/interface/interface';
+
 /**
  * Generated class for the UserProfilePage page.
  *
@@ -25,41 +28,29 @@ import { UserPostsPage } from '../user-posts/user-posts';
 })
 export class UserProfilePage {
 
-  nameVar: string;
-  cityVar: string;
-  stateVar: string;
-  countryVar: string;
-  emailVar: string;
-  userProfilePic: string;
-  userUid: string;
-  gender: string;
+  userId;
+  userInfo = <IHelpUser>{};
 
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               public phpService: PhpServiceProvider,
               private profileData: ProfileDataProvider) {
             
-    this.userUid = this.navParams.get('userId');
+    this.userId = this.navParams.get('userId');
   }
 
   ionViewWillEnter()
   {  
-    this.phpService.getUserInfo(this.userUid).subscribe(userinfo => {
-      this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(locationinfo => {
-        this.phpService.getUserProfilePic(this.userUid).subscribe(userProfilePic => {
-          
-          this.userUid = userinfo.userUid;
-          this.nameVar = userinfo.name;
-          this.emailVar = userinfo.email;
-          this.gender = userinfo.Gender;
-          this.countryVar = locationinfo.Country;
-          this.stateVar = locationinfo.State;
-          this.cityVar = locationinfo.City;
-          this.userProfilePic = constants.baseURI + userProfilePic.images_path;
-
-        });
-      }); 
-    }); 
+    this.phpService.getUserInfo(this.userId).subscribe(userinfo => {
+      this.userInfo.uid        = userinfo.userUid;
+      this.userInfo.email      = userinfo.email;
+      this.userInfo.name       = userinfo.name;
+      this.userInfo.gender     = userinfo.Gender;
+      this.userInfo.profilepic = constants.baseURI + userinfo.ProfilePicURL;
+      this.userInfo.city       = userinfo.City;
+      this.userInfo.state      = userinfo.State;
+      this.userInfo.country    = userinfo.Country;
+    });
   }
 
   // Display Image in Full Screen  

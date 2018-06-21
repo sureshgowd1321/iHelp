@@ -5,6 +5,9 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { FormsModule } from '@angular/forms';
 
+//Ionic Cache service
+import { CacheModule } from 'ionic-cache';
+
 // Angular Fire Modules
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -39,6 +42,7 @@ import { IonicImageViewerModule } from 'ionic-img-viewer';
 import { FileTransfer } from '@ionic-native/file-transfer';
 import { Camera } from '@ionic-native/camera';
 import { OrderModule } from 'ngx-order-pipe';
+// import { TimeAgoPipe } from 'time-ago-pipe';
 
 //Providers
 import { AuthServiceProvider } from '../providers/auth-service/auth-service';
@@ -65,11 +69,13 @@ import { ProfileDataProvider } from '../providers/profile-data/profile-data';
     DisplayPostDislikesPage,
     UserPostsPage,
     AddNewLocationPage
+    // TimeAgoPipe
   ],
   imports: [
     BrowserModule,
     HttpModule,
     IonicModule.forRoot(MyApp),
+    CacheModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,

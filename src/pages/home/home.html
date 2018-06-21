@@ -25,8 +25,6 @@
 
 <ion-content id="listScroll"> 
 
-  <p padding *ngIf="posts.length === 0"> No Posts. You can add new posts with in your location. </p>
-
     <ion-refresher (ionRefresh)="loadrefresh($event)">
       <ion-refresher-content pullingText="Pull to refresh"
                       pullingIcon="arrow-dropdown"
@@ -34,65 +32,63 @@
                       refreshingText="..fetching">
       </ion-refresher-content>
     </ion-refresher>
-    <!-- <div *ngIf="posts.length === 0"> No Posts </div> -->
-   
-    <ion-card *ngFor="let item of posts | orderBy: order:reverse:'case-insensitive'"  >    
-
+    
+    <ion-card *ngFor="let item of posts" >
+        
       <ion-item>
-
           <ion-avatar item-left >
               <img src="{{ item.profilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)" >
           </ion-avatar>
-
+          
           <ion-avatar item-right (click)="modifyCardActionSheet(item.id, posts, item)" *ngIf="item.createdById == user.uid">
-              <ion-icon name="ios-arrow-down"></ion-icon>
+            <ion-icon name="ios-arrow-down"></ion-icon>
           </ion-avatar>
 
-          <ion-avatar item-right (click)="addToWishlist(item.id, item)" *ngIf="item.createdById != user.uid && !item.addedToWishlist">
+          <ion-avatar item-right (click)="addToWishlist(item.id, item)" *ngIf="item.createdById != user.uid && item.isWished == 0">
             <ion-icon name="ios-heart-outline"></ion-icon>
           </ion-avatar>
 
-          <ion-avatar item-right (click)="removeFromWishlist(item.id, item)" *ngIf="item.createdById != user.uid && item.addedToWishlist">
+          <ion-avatar item-right (click)="removeFromWishlist(item.id, item)" *ngIf="item.createdById != user.uid && item.isWished == 1">
             <ion-icon name="ios-heart"></ion-icon>
           </ion-avatar>
 
           <a class="text-primary">
               <h2 (click)="gotoUsersPage(item.createdById)" class="labelStyle"> {{ item.name }} </h2>
-              <p> {{ item.createdDate | date: 'medium' }}  </p>
+              <p> {{ item.createdDate }}  </p>
           </a>
       </ion-item>
 
       <ion-card-content  >
-            <p (click)="gotoCommentsPage(item.id, posts, item)"> {{ item.post }} </p>  
-            <p> <img src="{{ item.postImages }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="item.postImages !== null"> </p>
-      </ion-card-content>
+          <p (click)="gotoCommentsPage(item.id, posts, item)"> {{ item.post }} </p>  
+          <p> <img src="{{ item.postImages }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="item.postImages !== null"> </p>
 
-      <ion-item (click)="gotoCommentsPage(item.id, posts, item)">
-      <p> <ion-icon name="thumbs-up" icon-left></ion-icon> {{ item.likesCount }}  . &nbsp;
-        <ion-icon name="thumbs-down" icon-left></ion-icon> {{ item.dislikesCount }}  . &nbsp;
-        <ion-icon name="text" icon-left></ion-icon> {{ item.commentsCount }} </p>
-      </ion-item>
+          <ion-item (click)="gotoCommentsPage(item.id, posts, item)">
+          <p> <ion-icon name="thumbs-up" icon-left></ion-icon> {{ item.likesCount }}  . &nbsp;
+            <ion-icon name="thumbs-down" icon-left></ion-icon> {{ item.dislikesCount }}  . &nbsp;
+            <ion-icon name="text" icon-left></ion-icon> {{ item.commentsCount }} </p>
+          </ion-item>
+      </ion-card-content>
 
       <ion-row>
         <ion-col>
-          <button ion-button icon-left clear small (click)="addLike(item.id, item)" *ngIf="!item.isPostLiked" >
+          <button ion-button icon-left clear small (click)="addLike(item.id, item)" *ngIf="item.isPostLiked == 0" >
             <ion-icon name="ios-thumbs-up-outline"></ion-icon>
             <div>Like</div>
           </button>
 
-          <button ion-button icon-left clear small (click)="removeLike(item.id, item)" *ngIf="item.isPostLiked">
+          <button ion-button icon-left clear small (click)="removeLike(item.id, item)" *ngIf="item.isPostLiked == 1">
             <ion-icon name="thumbs-up"></ion-icon>
             <div>Like</div>
           </button>
         </ion-col>
 
         <ion-col>
-          <button ion-button icon-left clear small (click)="addDislike(item.id, item)" *ngIf="!item.isPostDisliked" >
+          <button ion-button icon-left clear small (click)="addDislike(item.id, item)" *ngIf="item.isPostDisliked == 0" >
             <ion-icon name="ios-thumbs-down-outline"></ion-icon>
             <div>Dislike</div>
           </button>
 
-          <button ion-button icon-left clear small (click)="removeDislike(item.id, item)" *ngIf="item.isPostDisliked">
+          <button ion-button icon-left clear small (click)="removeDislike(item.id, item)" *ngIf="item.isPostDisliked == 1">
             <ion-icon name="thumbs-down"></ion-icon>
             <div>Dislike</div>
           </button>
@@ -108,8 +104,8 @@
 
   </ion-card>
 
-    <ion-infinite-scroll (ionInfinite)="loadMore($event)" >
-      <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>
-    </ion-infinite-scroll>
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)" >
+    <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
 </ion-content>

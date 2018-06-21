@@ -24,13 +24,13 @@
 
   <ion-item class="no-scroll">
       <ion-avatar item-left> 
-      <img src="{{ profilePic }}" class="thumb-img" #imageToView (click)="displayImageFullScreen(imageToView)">
+      <img src="{{ postInfo?.postedByProfilePic }}" class="thumb-img" #imageToView (click)="displayImageFullScreen(imageToView)">
       </ion-avatar>
       
       <a class="text-primary">
-          <h2 >  {{ userObj?.name }} </h2>
+          <h2 >  {{ postInfo?.postByName }} </h2>
       </a>
-      <p> {{ postObj?.CreatedDate | date: 'medium' }} </p>
+      <p> {{ postInfo?.postedDate }} </p>
   </ion-item>
 
   <ion-item class="no-scroll">

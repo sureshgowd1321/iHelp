@@ -34,6 +34,18 @@ export class ResetPasswordPage {
   resetPassword() {
     if (!this.resetPasswordForm.valid) {
       console.log(this.resetPasswordForm.value);
+
+      let alert = this.alertCtrl.create({
+        message: 'Please enter your Email',
+        buttons: [
+          {
+            text: "Ok",
+            role: 'cancel'
+          }
+        ]
+      });
+      alert.present();
+      
     } else {
       this.firebaseAuth
       .auth

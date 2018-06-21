@@ -48,23 +48,14 @@ export class DisplayPostDislikesPage {
 
   loadDislikes(){
     this.dislikes = [];
-
     this.phpService.getDislikesPerPost(this.postId).subscribe(dislikedUserInfo => {
-      if( dislikedUserInfo.length === 0 ){
-        // this.hasData = false;
-        }else {
-          dislikedUserInfo.forEach(dislike=>{
-            this.phpService.getUserInfo(dislike.UserUid).subscribe(userinfo => {
-              this.phpService.getUserProfilePic(dislike.UserUid).subscribe(userProfilePic => {
-                  this.dislikes.push({
-                    "userId"     : dislike.UserUid,
-                    "userName"   : userinfo.name,
-                    "profilePic" : constants.baseURI + userProfilePic.images_path
-                  });
-              });
-            });
-          });
-        }
+      dislikedUserInfo.forEach(dislike=>{
+        this.dislikes.push({
+          "userId"     : dislike.UserUid,
+          "userName"   : dislike.name,
+          "profilePic" : constants.baseURI + dislike.ProfilePicURL
+        });
+      });
     });
   }
 
