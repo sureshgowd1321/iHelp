@@ -25,11 +25,11 @@
 
   <ion-item class="no-scroll">
       <ion-avatar item-left>
-          <img src="{{ profilePic }}" class="thumb-img" #imageToView (click)="displayImageFullScreen(imageToView)">
+          <img src="{{ userInfo.profilepic }}" class="thumb-img" #imageToView (click)="displayImageFullScreen(imageToView)">
       </ion-avatar>
 
       <a class="text-primary">
-          <h2> {{userObj?.name}} </h2>
+          <h2> {{userInfo.name}} </h2>
       </a> 
   </ion-item>
 

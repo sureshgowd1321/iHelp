@@ -11,7 +11,6 @@ import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 
 // Interfaces
 import { IAllPosts } from '../../providers/interface/interface';
-import { IComment } from '../../providers/interface/interface';
 import { IComments } from '../../providers/interface/interface';
 import { CommentPost } from '../../providers/interface/interface';
 
@@ -27,8 +26,6 @@ import { HomePage } from '../../pages/home/home';
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
-
-
 
 @IonicPage()
 @Component({
@@ -47,22 +44,9 @@ export class CommentsPage {
   isIndexed: string;
   isRemoveFromSlice: string;
 
-  // public postObj : any;
-  // public userObj : any;
-  // public profilePic : string;
-  // public isPostInWishlist: boolean;
-  // public likesCount : number;
-  // public isPostLiked : boolean;
-  // public dislikesCount : number;
-  // public isPostDisliked : boolean;
   public commentsCount : number;
-  // public postImage: string;
 
   public comments: IComments[] = [];
-
-  // Order By Variables
-  // order: string = 'id';
-  // reverse: boolean = false;
 
   commentInput: string;
 
@@ -87,86 +71,8 @@ export class CommentsPage {
   ionViewWillEnter()
   {   
     this.comments.length = 0;
-    //this.loadpostInfo();
     this.loadAllComments(this.postId);
   }
-
-  // loadpostInfo(){
-
-  //   let loader = this.loadingCtrl.create({
-  //     content: "fetching..."
-  //   });
-  //   loader.present();
-
-  //   this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{ 
-  //     this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
-  //       this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {
-  //         this.phpService.getWishlistFromUserId(this.user.uid).subscribe(wishlistInfo => {   
-  //           this.phpService.getlikesCount(postInfo.ID).subscribe(likesCount => {
-  //             this.phpService.getdislikesCount(postInfo.ID).subscribe(dislikesCount => {
-  //               this.phpService.getlikeInfoPerUser(this.user.uid, this.postId).subscribe(userLikeInfo => {
-  //                 this.phpService.getDislikeInfoPerUser(this.user.uid, postInfo.ID).subscribe(userDislikeInfo => {
-  //                 this.phpService.getCountOfComments(postInfo.ID).subscribe(commentsCount => {
-  //                   this.phpService.getPostImages(postInfo.ID).subscribe(postImages => {
-
-  //                       // Check post is liked by loggedin User or not
-  //                       let isLiked = false;
-  //                       if( userLikeInfo === 0 ){
-  //                       }else{
-  //                         isLiked = true;
-  //                       }
-
-  //                       // Check post is liked by loggedin User or not
-  //                       let isDisliked = false;
-  //                       if( userDislikeInfo === 0 ){
-  //                       }else{
-  //                         isDisliked = true;
-  //                       }
-
-  //                       // Get Wishlist information
-  //                       let isInWishlist = false;
-
-  //                       if( wishlistInfo.length === 0 ){
-  //                       } else {
-  //                         wishlistInfo.forEach(wishObj=>{
-                
-  //                           if(wishObj.PostId === this.postId){
-  //                             isInWishlist = true;
-  //                           }    
-  //                         });
-  //                       }
-
-  //                       // Check each post has Image or not
-  //                       let postImage;
-  //                       if(postImages != false){
-  //                         postImage = constants.baseURI + postImages.images_path;
-  //                       }
-
-  //                       this.postObj          = postInfo;
-  //                       this.userObj          = userinfo;
-  //                       this.profilePic       = constants.baseURI + userProfilePic.images_path;
-  //                       this.isPostInWishlist = isInWishlist;
-  //                       this.likesCount       = likesCount;
-  //                       this.isPostLiked      = isLiked;
-  //                       this.dislikesCount    = dislikesCount;
-  //                       this.isPostDisliked   = isDisliked;
-  //                       this.commentsCount    = commentsCount;
-  //                       this.postImage        = postImage;
-
-  //                       loader.dismiss();
-  //                     });
-  //                   });
-  //                 });
-  //               });
-  //             });
-  //           });
-  //         });
-  //       });
-  //     });
-  //   });
-
-    
-  // }
 
   // Retrieve the JSON encoded data from the remote server
   // Using Angular's Http class and an Observable - then
@@ -181,19 +87,21 @@ export class CommentsPage {
 
         // Check each post has Image or not
         let postImage;
-        if(comment.postimg != null){
-          postImage = constants.baseURI + comment.postimg;
+        if(comment.puImg != null){
+          postImage = constants.baseURI + comment.puImg;
         }
 
+        let postStr = this.phpService.findAndReplace(comment.post, "&#39;", "'");
+        postStr = this.phpService.findAndReplace(postStr, "&#34;", "\"");
+
         if(hasPostInfo == false){
-          console.log('Inside haspostinfo: '+ hasPostInfo);
-          this.postInfo.postId             = comment.postId;
+          this.postInfo.postId             = comment.ID;
           this.postInfo.postImage          = postImage;
-          this.postInfo.postByName         = comment.postbyname;
-          this.postInfo.postedByProfilePic = constants.baseURI + comment.postUserProfilepic;
-          this.postInfo.post               = comment.post;
-          this.postInfo.postedDate         = comment.posteddate;
-          this.postInfo.postedById         = comment.postedby;
+          this.postInfo.postByName         = comment.puname;
+          this.postInfo.postedByProfilePic = constants.baseURI + comment.pupic;
+          this.postInfo.post               = postStr;
+          this.postInfo.postedDate         = comment.PostedDate;
+          this.postInfo.postedById         = comment.CreatedById;
           this.postInfo.isWished           = comment.isWished;
           this.postInfo.likesCount         = comment.likesCount;
           this.postInfo.dislikesCount      = comment.dislikesCount;
@@ -203,43 +111,27 @@ export class CommentsPage {
           hasPostInfo                      = true;
         }
 
-        this.comments.push({
-          "id"                    : comment.ID,
-          "comment"               : comment.comment,
-          "commentedById"         : comment.commentedBy,
-          "commentedDate"         : comment.commentedDate,
-          "commentedByName"       : comment.commentedbyname,
-          "commentedByProfilePic" : constants.baseURI + comment.commentedbypic
-        });
+        let commentStr;
+        if(comment.comment != null){
+          commentStr = this.phpService.findAndReplace(comment.comment, "&#39;", "'");
+          commentStr = this.phpService.findAndReplace(commentStr, "&#34;", "\"");
+        }else{
+          commentStr = comment.comment;
+        }
+
+
+        if(this.postInfo.commentsCount > 0){
+          this.comments.push({
+            "id"                    : comment.commentId,
+            "comment"               : commentStr,
+            "commentedById"         : comment.commentBy,
+            "commentedDate"         : comment.commentDate,
+            "commentedByName"       : comment.cuname,
+            "commentedByProfilePic" : constants.baseURI + comment.cupic
+          });
+        }
       });
     });
-
-   /*this.phpService.getAllComments(postId).subscribe(commentsInfo => {
-
-        if( commentsInfo.length === 0 ){
-          console.log('***Empty Comments');
-        } else {
-          commentsInfo.forEach(commentObj=>{
-
-            this.phpService.getUserInfo(commentObj.commentedBy).subscribe(userinfo => {
-              this.phpService.getUserProfilePic(commentObj.commentedBy).subscribe(userProfilePic => {
-
-                this.comments.push({
-                  "id"            : commentObj.ID,
-                  "postId"        : commentObj.postId,
-                  "comment"       : commentObj.comment,
-                  "commentedBy"   : commentObj.commentedBy,
-                  "commentedDate" : commentObj.commentedDate,
-                  "name"          : userinfo.name,
-                  "nickname"      : userinfo.nickname,
-                  "profilePic"    : constants.baseURI + userProfilePic.images_path
-                });
-              });      
-            });     
-          });
-          this.comments = this.orderPipe.transform(this.comments, 'id');
-        }
-      });*/
   }
 
   // Add Comments
@@ -329,7 +221,6 @@ export class CommentsPage {
 
   // Pull to Refresh functionality
   dorefresh(refresher) {
-    //this.loadpostInfo();
     this.loadAllComments(this.postId);
     if(refresher != 0)
       refresher.complete();

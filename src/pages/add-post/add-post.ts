@@ -20,6 +20,9 @@ import { Camera } from '@ionic-native/camera';
 // Platform Plugin
 import { Platform } from 'ionic-angular';
 
+// Interfaces
+import { IHelpUser } from '../../providers/interface/interface';
+
 /**
  * Generated class for the AddPostPage page.
  *
@@ -37,7 +40,8 @@ export class AddPostPage {
   @ViewChild('myInput') myInput: ElementRef;
 
   user;
-  
+  userInfo = <IHelpUser>{};
+
   public userObj : any;
   public locationObj : any;
   public profilePic : string;
@@ -60,31 +64,30 @@ export class AddPostPage {
     this.user = firebase.auth().currentUser; 
     this.base64Image = null;
     this.postDesc = '';
-
-    this.phpService.getUserInfo(this.user.uid).subscribe(userinfo => {
-      this.phpService.getUserProfilePic(this.user.uid).subscribe(userProfilePic => {
-        this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(locationInfo => {
-          
-          this.locationObj = locationInfo;
-          this.userObj = userinfo;
-          this.profilePic = constants.baseURI + userProfilePic.images_path;
-
-        });
-      });
-    });
   }
 
   ionViewWillEnter()
   {  
     this.selectedLocation = 'CT';
+    this.phpService.getUserInfo(this.user.uid).subscribe(userinfo => {
+      this.userInfo.uid        = userinfo.userUid;
+      this.userInfo.email      = userinfo.email;
+      this.userInfo.name       = userinfo.name;
+      this.userInfo.gender     = userinfo.Gender;
+      this.userInfo.profilepic = constants.baseURI + userinfo.ProfilePicURL;
+      this.userInfo.city       = userinfo.City;
+      this.userInfo.state      = userinfo.State;
+      this.userInfo.country    = userinfo.Country;
+      this.userInfo.postalCode = userinfo.PostalCode;
+    });
   }
 
   // Add post method
   addPost() {
     let postId: string;
 
-    this.phpService.addPost(this.postDesc, this.user.uid, this.selectedLocation, this.userObj.PostalCode,
-                            this.locationObj.City, this.locationObj.State, this.locationObj.Country).subscribe(res => { 
+    this.phpService.addPost(this.postDesc, this.userInfo.uid, this.selectedLocation, this.userInfo.postalCode,
+                            this.userInfo.city, this.userInfo.state, this.userInfo.country).subscribe(res => { 
       postId = JSON.stringify(res["id"]).replace(/"/g, "");
 
       if( this.base64Image != null ){

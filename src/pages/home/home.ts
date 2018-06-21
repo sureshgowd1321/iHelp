@@ -68,11 +68,14 @@ export class HomePage {
           postImage = constants.baseURI + postInfo.images_path;
         }
 
+        let postStr = this.phpService.findAndReplace(postInfo.post, "&#39;", "'");
+        postStr = this.phpService.findAndReplace(postStr, "&#34;", "\"");
+
         this.posts.push(
           {
             "id"            : postInfo.ID,
-            "post"          : postInfo.post,
-            "createdDate"   : postInfo.CreatedDate,
+            "post"          : postStr,
+            "createdDate"   : postInfo.PostedDate,
             "name"          : postInfo.name,
             "profilePic"    : constants.baseURI + postInfo.ProfilePicURL,
             "createdById"   : postInfo.CreatedById,

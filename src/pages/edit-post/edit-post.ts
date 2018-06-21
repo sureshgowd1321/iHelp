@@ -11,6 +11,8 @@ import { ProfileDataProvider } from '../../providers/profile-data/profile-data';
 
 // Interfaces
 import { IPosts } from '../../providers/interface/interface';
+import { IHelpUser } from '../../providers/interface/interface';
+import { CommentPost } from '../../providers/interface/interface';
 
 //Pages
 import { TabsPage } from '../tabs/tabs';
@@ -40,20 +42,18 @@ export class EditPostPage {
 
   postId: string;
   user;
+  userInfo = <IHelpUser>{};
+  postInfo = <CommentPost>{};
+  
   postDesc: any;
   originalPostDesc: any;
-
-  public postObj : any;
-  public userObj : any;
-  public locationObj : any;
-  public profilePic : string;
   selectedLocation;
   originalSelectedLocation;
 
   posts:  IPosts[] = [];
   postItem: any;
 
-  // Capture
+  public postedDate: string;
   public base64Image: string;
   public isImageDeleted: boolean;
   public isImageChanged: boolean;
@@ -79,33 +79,37 @@ export class EditPostPage {
     this.isImageDeleted = false;
     this.isImageChanged = false;
     
-    this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{ 
-      this.phpService.getUserInfo(postInfo.CreatedById).subscribe(userinfo => {
-          this.phpService.getUserProfilePic(postInfo.CreatedById).subscribe(userProfilePic => {
-            this.phpService.getLocationInfo(userinfo.PostalCode).subscribe(locationInfo => {
-              this.phpService.getPostImages(postInfo.ID).subscribe(postImages => {
+    this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{
 
-                // Check each post has Image or not
-                let postImage = null;
-                if(postImages != false){
-                  postImage = constants.baseURI + postImages.images_path;
-                }
+        // Check each post has Image or not
+        let postImage = null;
+        if(postInfo.puImg != null){
+          postImage = constants.baseURI + postInfo.puImg;
+        }
 
-                this.postObj = postInfo;
-                this.userObj = userinfo;
-                this.profilePic = constants.baseURI + userProfilePic.images_path;
-                this.postDesc = postInfo.post;
-                this.originalPostDesc = postInfo.post;
-                this.locationObj = locationInfo;
-                this.selectedLocation = postInfo.PostedLocation;
-                this.originalSelectedLocation = postInfo.PostedLocation;
-                this.base64Image = postImage;
+        let postStr = this.phpService.findAndReplace(postInfo.post, "&#39;", "'");
+        postStr = this.phpService.findAndReplace(postStr, "&#34;", "\"");
 
-              });
-            });
-          });
-        });
-      });
+        this.postInfo.postId             = postInfo.ID;
+        this.base64Image                 = postImage;
+        this.postInfo.postByName         = postInfo.puname;
+        this.postInfo.postedByProfilePic = constants.baseURI + postInfo.pupic;
+        this.postDesc                    = postStr;
+        this.originalPostDesc            = postStr;
+        this.postInfo.postedDate         = postInfo.PostedDate;
+        this.postInfo.postedById         = postInfo.CreatedById;
+        this.postInfo.postalCode         = postInfo.pucode;
+        this.selectedLocation            = postInfo.PostedLocation;
+        this.originalSelectedLocation    = postInfo.PostedLocation;
+        this.postInfo.postedCity         = postInfo.City;
+        this.postInfo.postedState        = postInfo.State;
+        this.postInfo.postedCountry      = postInfo.Country;
+    });
+    }
+
+    ionViewWillEnter()
+    {  
+      this.selectedLocation = 'CT';
     }
 
   // Edit post method
@@ -116,8 +120,8 @@ export class EditPostPage {
       this.navCtrl.pop();
 
     }else{
-      this.phpService.updatePost(postDesc, this.postId, this.selectedLocation, this.userObj.PostalCode,
-                                this.locationObj.City, this.locationObj.State, this.locationObj.Country).subscribe(res => {
+      this.phpService.updatePost(postDesc, this.postId, this.selectedLocation, this.postInfo.postalCode,
+                                  this.postInfo.postedCity, this.postInfo.postedState, this.postInfo.postedCountry).subscribe(res => {
 
         var index = this.posts.indexOf(this.postItem);
 

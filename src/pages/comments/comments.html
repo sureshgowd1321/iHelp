@@ -37,7 +37,8 @@
       </ion-avatar>
 
       <a class="text-primary">
-        <h2> {{ postInfo?.postByName }} </h2>
+        <!-- <h2> {{ postInfo?.postByName }} </h2> -->
+        <h2 (click)="gotoUsersPage(postInfo?.postedById)" class="labelStyle"> {{postInfo?.postByName}}</h2>
         <p> {{ postInfo?.postedDate }} </p>
       </a>
 
@@ -46,7 +47,8 @@
     <ion-card-content>
       <p> {{ postInfo?.post }} </p>
       <p>
-        <img src="{{ postInfo?.postImage }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="postInfo?.postImage !== null"> </p>
+        <img src="{{ postInfo?.postImage }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)" *ngIf="postInfo?.postImage !== null"> 
+      </p>
     </ion-card-content>
 
     <ion-row>
@@ -108,23 +110,23 @@
     <ion-item-sliding *ngFor="let comment of comments">
       <ion-item class="item-icon-left" text-wrap>
         <ion-avatar item-left>
-          <img src="{{ comment.commentedByProfilePic }}" #imageToView (click)="displayImageFullScreen(imageToView)">
+          <img src="{{ comment?.commentedByProfilePic }}" #imageToView1 (click)="displayImageFullScreen(imageToView1)">
         </ion-avatar>
 
         <a class="text-primary">
-          <h2 (click)="gotoUsersPage(comment.commentedById)" class="labelStyle"> {{comment.commentedByName}}</h2>
-          <p> {{ comment.commentedDate }} </p>
+          <h2 (click)="gotoUsersPage(comment?.commentedById)" class="labelStyle"> {{comment?.commentedByName}}</h2>
+          <p> {{ comment?.commentedDate }} </p>
         </a>
 
-        {{comment.comment}}
+        {{comment?.comment}}
 
       </ion-item>
 
-      <ion-item-options side="right" *ngIf="comment.commentedById === user.uid">
-        <button color="danger" ion-button (click)="deleteComment(comment.id)">
+      <ion-item-options side="right" *ngIf="comment?.commentedById === user.uid">
+        <button color="danger" ion-button (click)="deleteComment(comment?.id)">
           <ion-icon name="trash"> Delete</ion-icon>
         </button>
-        <button danger ion-button (click)="editComment(comment.id, comment.comment)">
+        <button danger ion-button (click)="editComment(comment?.id, comment?.comment)">
           <ion-icon name="edit">Edit</ion-icon>
         </button>
       </ion-item-options>
@@ -137,7 +139,7 @@
 <ion-footer>
   <ion-toolbar position="bottom">
 
-    <ion-textarea #myInput id="myInput" rows="1" maxLength="500" (keyup)="resize()" [(ngModel)]="commentInput" placeholder="Write a comment..."></ion-textarea>
+    <ion-textarea #myInput id="myInput" rows="1" maxLength="500" (keyup)="resize()" [(ngModel)]="commentInput" placeholder="Leave your thoughts..."></ion-textarea>
 
     <ion-buttons end style="padding-right:10px">
       <button ion-button color="primary" blocked (click)="postComment(commentInput)" [disabled]="commentInput?.length < 1" large>
