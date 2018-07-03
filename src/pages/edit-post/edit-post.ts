@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, ActionSheetController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ActionSheetController, AlertController, ToastController } from 'ionic-angular';
 import * as firebase from 'firebase/app'; 
 
 //Constants
@@ -20,6 +20,8 @@ import { TabsPage } from '../tabs/tabs';
 // Native Plugins
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 import { Camera } from '@ionic-native/camera';
+import { Diagnostic } from '@ionic-native/diagnostic';
+import { AndroidPermissions } from '@ionic-native/android-permissions';
 
 // Platform Plugin
 import { Platform } from 'ionic-angular';
@@ -67,44 +69,58 @@ export class EditPostPage {
               public loadingCtrl: LoadingController,
               public actionSheetCtrl: ActionSheetController,
               public alertCtrl: AlertController,
-              public platform: Platform) {
+              public platform: Platform,
+              private _DIAGNOSTIC  : Diagnostic,
+              public toastCtrl: ToastController,
+              private androidPermissions: AndroidPermissions) {
     
-    // NavParams
-    this.user = firebase.auth().currentUser;
-    this.postId = this.navParams.get('postId');
-    this.posts = this.navParams.get('posts');
-    this.postItem = this.navParams.get('postItem');
+      // NavParams
+      this.user = firebase.auth().currentUser;
+      this.postId = this.navParams.get('postId');
+      this.posts = this.navParams.get('posts');
+      this.postItem = this.navParams.get('postItem');
 
-    this.base64Image = null;
-    this.isImageDeleted = false;
-    this.isImageChanged = false;
-    
-    this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{
+      this.base64Image = null;
+      this.isImageDeleted = false;
+      this.isImageChanged = false;
+      
+      this.phpService.getPostInfo(this.postId).subscribe(postInfo =>{
 
-        // Check each post has Image or not
-        let postImage = null;
-        if(postInfo.puImg != null){
-          postImage = constants.baseURI + postInfo.puImg;
+          // Check each post has Image or not
+          let postImage = null;
+          if(postInfo.puImg != null){
+            postImage = constants.baseURI + postInfo.puImg;
+          }
+
+          let postStr = this.phpService.findAndReplace(postInfo.post, "&#39;", "'");
+          postStr = this.phpService.findAndReplace(postStr, "&#34;", "\"");
+
+          this.postInfo.postId             = postInfo.ID;
+          this.base64Image                 = postImage;
+          this.postInfo.postByName         = postInfo.puname;
+          this.postInfo.postedByProfilePic = constants.baseURI + postInfo.pupic;
+          this.postDesc                    = postStr;
+          this.originalPostDesc            = postStr;
+          this.postInfo.postedDate         = postInfo.PostedDate;
+          this.postInfo.postedById         = postInfo.CreatedById;
+          this.postInfo.postalCode         = postInfo.pucode;
+          this.selectedLocation            = postInfo.PostedLocation;
+          this.originalSelectedLocation    = postInfo.PostedLocation;
+          this.postInfo.postedCity         = postInfo.City;
+          this.postInfo.postedState        = postInfo.State;
+          this.postInfo.postedCountry      = postInfo.Country;
+      });
+
+      this.platform.ready()
+      .then(() =>
+      {
+        if(this.platform.is('android')){
+          console.log('This is android ');
+
+          this.getPermissionOnCamera();
+          this.getPermissionOnReadStorage();
         }
-
-        let postStr = this.phpService.findAndReplace(postInfo.post, "&#39;", "'");
-        postStr = this.phpService.findAndReplace(postStr, "&#34;", "\"");
-
-        this.postInfo.postId             = postInfo.ID;
-        this.base64Image                 = postImage;
-        this.postInfo.postByName         = postInfo.puname;
-        this.postInfo.postedByProfilePic = constants.baseURI + postInfo.pupic;
-        this.postDesc                    = postStr;
-        this.originalPostDesc            = postStr;
-        this.postInfo.postedDate         = postInfo.PostedDate;
-        this.postInfo.postedById         = postInfo.CreatedById;
-        this.postInfo.postalCode         = postInfo.pucode;
-        this.selectedLocation            = postInfo.PostedLocation;
-        this.originalSelectedLocation    = postInfo.PostedLocation;
-        this.postInfo.postedCity         = postInfo.City;
-        this.postInfo.postedState        = postInfo.State;
-        this.postInfo.postedCountry      = postInfo.Country;
-    });
+      });
     }
 
     ionViewWillEnter()
@@ -197,10 +213,10 @@ export class EditPostPage {
     this.camera.getPicture({
         sourceType: this.camera.PictureSourceType.CAMERA,
         destinationType: this.camera.DestinationType.DATA_URL,
-        targetWidth: 1000,
-        targetHeight: 1000,
+        targetWidth: 800,
+        targetHeight: 800,
         allowEdit : false,
-        quality: 100,
+        quality: 50,
         saveToPhotoAlbum: false
     }).then((imageData) => {
       // imageData is a base64 encoded string
@@ -222,8 +238,8 @@ export class EditPostPage {
     let options = {
       sourceType: this.camera.PictureSourceType.SAVEDPHOTOALBUM,
 			destinationType: this.camera.DestinationType.DATA_URL,
-			targetWidth: 1000,
-			targetHeight: 1000
+			targetWidth: 800,
+			targetHeight: 800
     };
 
 		this.camera.getPicture(options).then((imageData) => {
@@ -299,6 +315,66 @@ export class EditPostPage {
       ]
     })
     alert.present();
+  }
+
+  /*checkPermissionsToTakePicture() {
+    this._DIAGNOSTIC.isCameraAuthorized().then((authorized) => {
+      if(authorized)
+          this.takePicture();
+      else {
+        this._DIAGNOSTIC.requestCameraAuthorization().then((status) => {
+              if(status == this._DIAGNOSTIC.permissionStatus.GRANTED)
+                  this.takePicture();
+              else {
+                // Permissions not granted
+                // Therefore, create and present toast
+                this.toastCtrl.create(
+                    {
+                        message: "Cannot access camera", 
+                        position: "bottom",
+                        duration: 5000
+                    }
+                ).present();
+              }
+          });
+        }
+    });
+  }*/
+   
+   getPermissionOnCamera() {
+    this._DIAGNOSTIC.getPermissionAuthorizationStatus(this._DIAGNOSTIC.permission.CAMERA).then((status) => {
+      console.log(`AuthorizationStatus`);
+      console.log(status);
+      if (status != this._DIAGNOSTIC.permissionStatus.GRANTED) {
+        this._DIAGNOSTIC.requestRuntimePermission(this._DIAGNOSTIC.permission.CAMERA).then((data) => {
+          console.log(`getCameraAuthorizationStatus`);
+          console.log(data);
+        })
+      } else {
+        console.log("We have the permission");
+      }
+    }, (statusError) => {
+      console.log(`statusError`);
+      console.log(statusError);
+    });
+  }
+
+  getPermissionOnReadStorage() {
+    this._DIAGNOSTIC.getPermissionAuthorizationStatus(this._DIAGNOSTIC.permission.READ_EXTERNAL_STORAGE).then((status) => {
+      console.log(`AuthorizationStatus`);
+      console.log(status);
+      if (status != this._DIAGNOSTIC.permissionStatus.GRANTED) {
+        this._DIAGNOSTIC.requestRuntimePermission(this._DIAGNOSTIC.permission.READ_EXTERNAL_STORAGE).then((data) => {
+          console.log(`permission.READ_EXTERNAL_STORAGE`);
+          console.log(data);
+        })
+      } else {
+        console.log("We have the permission");
+      }
+    }, (statusError) => {
+      console.log(`statusError`);
+      console.log(statusError);
+    });
   }
 
 }

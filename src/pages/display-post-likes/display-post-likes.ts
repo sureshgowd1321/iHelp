@@ -54,7 +54,7 @@ export class DisplayPostLikesPage {
               this.likes.push({
                 "userId"     : like.UserUid,
                 "userName"   : like.name,
-                "profilePic" : constants.baseURI + like.images_path
+                "profilePic" : constants.baseURI + like.ProfilePicURL
               });
         });
     });

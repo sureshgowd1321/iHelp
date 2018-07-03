@@ -82,6 +82,7 @@ export class ProfileDataProvider {
   displayImageInFullScreen(imageToView) {
     const viewer = this.imageViewerCtrl.create(imageToView)
     viewer.present();
-}
+  }
+  public
 
 }

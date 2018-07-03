@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { IonicPage, NavController, LoadingController, ActionSheetController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, ActionSheetController, AlertController, ToastController } from 'ionic-angular';
 
 import * as firebase from 'firebase/app'; 
 
@@ -16,6 +16,7 @@ import { TabsPage } from '../tabs/tabs';
 // Native Plugins
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 import { Camera } from '@ionic-native/camera';
+import { Diagnostic } from '@ionic-native/diagnostic';
 
 // Platform Plugin
 import { Platform } from 'ionic-angular';
@@ -59,11 +60,25 @@ export class AddPostPage {
               public loadingCtrl: LoadingController,
               public actionSheetCtrl: ActionSheetController,
               public alertCtrl: AlertController,
-              public platform: Platform) {
+              public platform: Platform,
+              private _DIAGNOSTIC  : Diagnostic,
+              public toastCtrl: ToastController) {
     
     this.user = firebase.auth().currentUser; 
     this.base64Image = null;
     this.postDesc = '';
+
+    this.platform.ready()
+    .then(() =>
+    {
+      if(this.platform.is('android')){
+        console.log('This is android ');
+
+        this.getPermissionOnCamera();
+        this.getPermissionOnReadStorage();
+      }
+    });
+
   }
 
   ionViewWillEnter()
@@ -140,10 +155,10 @@ export class AddPostPage {
     this.camera.getPicture({
         sourceType: this.camera.PictureSourceType.CAMERA,
         destinationType: this.camera.DestinationType.DATA_URL,
-        targetWidth: 1000,
-        targetHeight: 1000,
-        allowEdit : false,
-        quality: 100,
+        targetWidth: 800,
+        targetHeight: 800,
+        allowEdit : true,
+        quality: 50,
         saveToPhotoAlbum: false
     }).then((imageData) => {
       // imageData is a base64 encoded string
@@ -160,8 +175,8 @@ export class AddPostPage {
     let options = {
       sourceType: this.camera.PictureSourceType.SAVEDPHOTOALBUM,
 			destinationType: this.camera.DestinationType.DATA_URL,
-			targetWidth: 1000,
-			targetHeight: 1000
+			targetWidth: 800,
+			targetHeight: 800
     };
 
 		this.camera.getPicture(options).then((imageData) => {
@@ -231,6 +246,42 @@ export class AddPostPage {
       ]
     })
     alert.present();
+  }
+
+  getPermissionOnCamera() {
+    this._DIAGNOSTIC.getPermissionAuthorizationStatus(this._DIAGNOSTIC.permission.CAMERA).then((status) => {
+      console.log(`AuthorizationStatus`);
+      console.log(status);
+      if (status != this._DIAGNOSTIC.permissionStatus.GRANTED) {
+        this._DIAGNOSTIC.requestRuntimePermission(this._DIAGNOSTIC.permission.CAMERA).then((data) => {
+          console.log(`getCameraAuthorizationStatus`);
+          console.log(data);
+        })
+      } else {
+        console.log("We have the permission");
+      }
+    }, (statusError) => {
+      console.log(`statusError`);
+      console.log(statusError);
+    });
+  }
+
+  getPermissionOnReadStorage() {
+    this._DIAGNOSTIC.getPermissionAuthorizationStatus(this._DIAGNOSTIC.permission.READ_EXTERNAL_STORAGE).then((status) => {
+      console.log(`AuthorizationStatus`);
+      console.log(status);
+      if (status != this._DIAGNOSTIC.permissionStatus.GRANTED) {
+        this._DIAGNOSTIC.requestRuntimePermission(this._DIAGNOSTIC.permission.READ_EXTERNAL_STORAGE).then((data) => {
+          console.log(`permission.READ_EXTERNAL_STORAGE`);
+          console.log(data);
+        })
+      } else {
+        console.log("We have the permission");
+      }
+    }, (statusError) => {
+      console.log(`statusError`);
+      console.log(statusError);
+    });
   }
 
 }

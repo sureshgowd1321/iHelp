@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController, ActionSheetController, ToastController } from 'ionic-angular';
 
 import * as firebase from 'firebase/app';
 
@@ -17,9 +17,13 @@ import { IHelpUser } from '../../providers/interface/interface';
 // Native Plugins
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 import { Camera } from '@ionic-native/camera';
+import { Diagnostic } from '@ionic-native/diagnostic';
 
 //Pages
 import { AddNewLocationPage } from '../add-new-location/add-new-location';
+
+// Platform Plugin
+import { Platform } from 'ionic-angular';
 
 /**
  * Generated class for the EditProfilePage page.
@@ -62,10 +66,25 @@ export class EditProfilePage {
               public loadingCtrl: LoadingController,
               private profileData: ProfileDataProvider,
               public alertCtrl: AlertController,
-              public actionSheetCtrl: ActionSheetController) {
+              public actionSheetCtrl: ActionSheetController,
+              private _DIAGNOSTIC  : Diagnostic,
+              public toastCtrl: ToastController,
+              public platform: Platform
+            ) {
 
     this.user = firebase.auth().currentUser; 
     
+    this.platform.ready()
+    .then(() =>
+    {
+      if(this.platform.is('android')){
+        console.log('This is android ');
+
+        this.getPermissionOnCamera();
+        this.getPermissionOnReadStorage();
+      }
+    });
+
   }
 
   ionViewWillEnter()
@@ -85,19 +104,6 @@ export class EditProfilePage {
       this.selectedState   = userinfo.State;
       this.selectedCity    = userinfo.City;
     });
-    /*this.phpService.getUserInfo(this.user.uid).subscribe(userinfo => {
-
-      this.updatedName    = userinfo.name;
-      this.updatedGender  = userinfo.Gender;
-      this.userProfilePic = constants.baseURI + userinfo.ProfilePicURL;
-      this.userCity       = userinfo.City;
-      this.userState      = userinfo.State;
-      this.userCountry    = userinfo.Country;
-
-      this.selectedCountry = userinfo.Country;
-      this.selectedState   = userinfo.State;
-      this.selectedCity    = userinfo.City;
-    });*/
    
     this.phpService.getAllCountries().subscribe(countriesInfo => {
       countriesInfo.forEach(countryObj=>{
@@ -173,8 +179,8 @@ goToProfilePage(): void {
     this.camera.getPicture({
         sourceType: this.camera.PictureSourceType.CAMERA,
         destinationType: this.camera.DestinationType.DATA_URL,
-        targetWidth: 1000,
-        targetHeight: 1000,
+        targetWidth: 800,
+        targetHeight: 800,
         quality: 50
     }).then((imageData) => {
       // imageData is a base64 encoded string
@@ -213,8 +219,8 @@ goToProfilePage(): void {
     let options = {
       sourceType: this.camera.PictureSourceType.SAVEDPHOTOALBUM,
 			destinationType: this.camera.DestinationType.DATA_URL,
-			targetWidth: 1000,
-			targetHeight: 1000
+			targetWidth: 800,
+			targetHeight: 800
     };
 
 		this.camera.getPicture(options).then((imageData) => {
@@ -295,6 +301,66 @@ goToProfilePage(): void {
     });
 
     actionSheet.present();
+  }
+
+  checkPermissionsToTakePicture() {
+    this._DIAGNOSTIC.isCameraAuthorized().then((authorized) => {
+      if(authorized)
+          this.takePicture();
+      else {
+        this._DIAGNOSTIC.requestCameraAuthorization().then((status) => {
+              if(status == this._DIAGNOSTIC.permissionStatus.GRANTED)
+                  this.takePicture();
+              else {
+                // Permissions not granted
+                // Therefore, create and present toast
+                this.toastCtrl.create(
+                    {
+                        message: "Cannot access camera", 
+                        position: "bottom",
+                        duration: 5000
+                    }
+                ).present();
+              }
+          });
+        }
+    });
+  }
+
+  getPermissionOnCamera() {
+    this._DIAGNOSTIC.getPermissionAuthorizationStatus(this._DIAGNOSTIC.permission.CAMERA).then((status) => {
+      console.log(`AuthorizationStatus`);
+      console.log(status);
+      if (status != this._DIAGNOSTIC.permissionStatus.GRANTED) {
+        this._DIAGNOSTIC.requestRuntimePermission(this._DIAGNOSTIC.permission.CAMERA).then((data) => {
+          console.log(`getCameraAuthorizationStatus`);
+          console.log(data);
+        })
+      } else {
+        console.log("We have the permission");
+      }
+    }, (statusError) => {
+      console.log(`statusError`);
+      console.log(statusError);
+    });
+  }
+
+  getPermissionOnReadStorage() {
+    this._DIAGNOSTIC.getPermissionAuthorizationStatus(this._DIAGNOSTIC.permission.READ_EXTERNAL_STORAGE).then((status) => {
+      console.log(`AuthorizationStatus`);
+      console.log(status);
+      if (status != this._DIAGNOSTIC.permissionStatus.GRANTED) {
+        this._DIAGNOSTIC.requestRuntimePermission(this._DIAGNOSTIC.permission.READ_EXTERNAL_STORAGE).then((data) => {
+          console.log(`permission.READ_EXTERNAL_STORAGE`);
+          console.log(data);
+        })
+      } else {
+        console.log("We have the permission");
+      }
+    }, (statusError) => {
+      console.log(`statusError`);
+      console.log(statusError);
+    });
   }
 
   // Go to Add New Location Page to add new location

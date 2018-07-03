@@ -42,7 +42,8 @@ import { IonicImageViewerModule } from 'ionic-img-viewer';
 import { FileTransfer } from '@ionic-native/file-transfer';
 import { Camera } from '@ionic-native/camera';
 import { OrderModule } from 'ngx-order-pipe';
-// import { TimeAgoPipe } from 'time-ago-pipe';
+import { Diagnostic } from '@ionic-native/diagnostic';
+import { AndroidPermissions } from '@ionic-native/android-permissions';
 
 //Providers
 import { AuthServiceProvider } from '../providers/auth-service/auth-service';
@@ -109,6 +110,8 @@ import { ProfileDataProvider } from '../providers/profile-data/profile-data';
     SplashScreen,
     FileTransfer,
     Camera,
+    Diagnostic,
+    AndroidPermissions,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     AuthServiceProvider,
     PhpServiceProvider,
